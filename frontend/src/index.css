@@ -112,6 +112,42 @@ h1, h2, h3, .heading-font {
   border-radius: 4px;
 }
 
+/* Landing Page Responsive Classes */
+.landing-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 5rem;
+  letter-spacing: 4px;
+}
+
+.landing-subtitle {
+  font-size: 1.4rem;
+  letter-spacing: 12px;
+}
+
+.landing-btn {
+  font-size: 1.5rem;
+  padding: 15px 60px !important;
+  box-shadow: 0 0 40px var(--accent-color);
+  transition: all 0.3s;
+}
+
+@media (max-width: 768px) {
+  .landing-title {
+    font-size: 3rem;
+    letter-spacing: 2px;
+  }
+  .landing-subtitle {
+    font-size: 0.9rem;
+    letter-spacing: 4px;
+    padding: 0 20px;
+  }
+  .landing-btn {
+    font-size: 1.1rem;
+    padding: 12px 30px !important;
+    width: auto !important; /* Don't force full width for hero button */
+  }
+}
+
 .win { background: var(--accent-color); color: #000; }
 .draw { background: #888; color: #fff; }
 .loss { background: #ff4444; color: #fff; }

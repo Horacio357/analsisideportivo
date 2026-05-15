@@ -37,17 +37,16 @@ const LandingPage = ({ onEnter, t }) => {
         style={{ textAlign: 'center', zIndex: 2 }}
       >
         <Trophy size={80} color="var(--accent-color)" style={{ marginBottom: '20px', filter: 'drop-shadow(0 0 15px var(--accent-color))' }} />
-        <h1 className="heading-font" style={{ fontSize: '5rem', color: 'var(--accent-color)', marginBottom: '10px', textShadow: '0 0 30px rgba(0,255,136,0.6)' }}>
+        <h1 className="landing-title" style={{ color: 'var(--accent-color)', marginBottom: '10px', textShadow: '0 0 30px rgba(0,255,136,0.6)' }}>
           BET <span style={{ color: 'var(--text-main)' }}>AI</span>
         </h1>
-        <p style={{ color: 'var(--text-main)', marginBottom: '40px', letterSpacing: '12px', fontWeight: 'bold', fontSize: '1.4rem', textTransform: 'uppercase' }}>
+        <p className="landing-subtitle" style={{ color: 'var(--text-main)', marginBottom: '40px', fontWeight: 'bold', textTransform: 'uppercase' }}>
           PRO FOOTBALL ANALYTICS
         </p>
         
         <button 
-          className="pes-button" 
+          className="pes-button landing-btn" 
           onClick={onEnter}
-          style={{ fontSize: '1.5rem', padding: '15px 60px', boxShadow: '0 0 40px var(--accent-color)', transition: 'all 0.3s' }}
         >
           {t.enter}
         </button>
