@@ -166,7 +166,7 @@ const App = () => {
 
       {/* League Selector */}
       <div style={{ padding: '0 20px', marginBottom: '20px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+        <div className="league-selector-container" style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
           <span style={{ fontSize: '0.7rem', color: 'var(--text-dim)', letterSpacing: '1.5px', fontFamily: 'Orbitron', flexShrink: 0 }}>LIGA</span>
           <div style={{ position: 'relative', flex: '0 0 auto' }}>
             <select
@@ -277,13 +277,13 @@ const App = () => {
         {/* ── Unified Analysis Panel ── */}
         <section className="glass-panel">
           {/* Toggle header */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px', flexWrap: 'wrap', gap: '12px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px', flexWrap: 'wrap', gap: '20px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', width: '100%', justifyContent: 'center' }} className="mobile-only-header">
               {analysisMode === 'team' ? <Trophy color="var(--accent-secondary)" size={20} /> : <Users color="var(--accent-color)" size={20} />}
               <h2 className="heading-font" style={{ fontSize: '1rem' }}>ANÁLISIS</h2>
             </div>
             {/* Mode toggle pills */}
-            <div style={{ display: 'flex', background: 'rgba(255,255,255,0.05)', borderRadius: '10px', padding: '4px', gap: '4px' }}>
+            <div style={{ display: 'flex', background: 'rgba(255,255,255,0.05)', borderRadius: '10px', padding: '4px', gap: '4px', margin: '0 auto' }}>
               {[{ id: 'team', label: '🏟️ Equipo' }, { id: 'player', label: '👤 Jugador' }].map(m => (
                 <button
                   key={m.id}
