@@ -240,23 +240,23 @@ const App = () => {
                   className="match-card"
                   style={{ marginBottom: '15px', padding: '15px', borderLeft: '4px solid var(--accent-color)', background: 'rgba(255,255,255,0.05)' }}
                 >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
-                    <span className="heading-font" style={{ fontSize: '0.9rem' }}>{match.home}</span>
-                    <span style={{ color: 'var(--accent-secondary)' }}>VS</span>
-                    <span className="heading-font" style={{ fontSize: '0.9rem' }}>{match.away}</span>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px', gap: '10px', alignItems: 'center' }}>
+                    <span className="heading-font" style={{ fontSize: 'var(--team-font-size)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '40%' }}>{match.home}</span>
+                    <span style={{ color: 'var(--accent-secondary)', fontSize: '0.78rem' }}>VS</span>
+                    <span className="heading-font" style={{ fontSize: 'var(--team-font-size)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '40%' }}>{match.away}</span>
                   </div>
                   <div style={{ display: 'flex', gap: '10px' }}>
                     <div className="prob-bar">
                       <div style={{ width: `${match.homeProb}%`, background: 'var(--accent-color)' }}></div>
-                      <span style={{ fontSize: '0.7rem' }}>L: {match.homeProb}%</span>
+                      <span style={{ fontSize: 'var(--bar-text-size)' }}>L: {match.homeProb}%</span>
                     </div>
                     <div className="prob-bar">
                       <div style={{ width: `${match.drawProb}%`, background: '#888' }}></div>
-                      <span style={{ fontSize: '0.7rem' }}>E: {match.drawProb}%</span>
+                      <span style={{ fontSize: 'var(--bar-text-size)' }}>E: {match.drawProb}%</span>
                     </div>
                     <div className="prob-bar">
                       <div style={{ width: `${match.awayProb}%`, background: '#ff4444' }}></div>
-                      <span style={{ fontSize: '0.7rem' }}>V: {match.awayProb}%</span>
+                      <span style={{ fontSize: 'var(--bar-text-size)' }}>V: {match.awayProb}%</span>
                     </div>
                   </div>
                   <button 
@@ -548,7 +548,7 @@ const App = () => {
                       </div>
 
                       {/* Duel details */}
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', alignItems: 'center', gap: '15px', marginBottom: '18px' }}>
+                      <div className="star-duel-grid" style={{ alignItems: 'center' }}>
                         {/* Home Player Card */}
                         <div 
                           onClick={() => {
@@ -567,14 +567,14 @@ const App = () => {
                           }}
                         >
                           <div style={{ fontSize: '1.4rem', marginBottom: '4px' }}>👤</div>
-                          <div style={{ fontSize: '0.82rem', fontWeight: 'bold', fontFamily: 'Orbitron', color: 'var(--text-main)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{homeP.name}</div>
+                          <div style={{ fontSize: 'var(--star-duel-name-size)', fontWeight: 'bold', fontFamily: 'Orbitron', color: 'var(--text-main)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{homeP.name}</div>
                           <div style={{ fontSize: '0.65rem', color: 'var(--accent-color)', marginTop: '2px', fontWeight: 600 }}>{homeP.team}</div>
                           <div style={{ marginTop: '8px', fontSize: '0.72rem', background: 'rgba(255,255,255,0.05)', borderRadius: '4px', padding: '3px 6px', color: 'var(--text-dim)' }}>
                             Rating: <span style={{ color: '#fff', fontWeight: 700 }}>{Math.max(...Object.values(homeP.stats))}%</span>
                           </div>
                         </div>
 
-                        <div style={{ fontSize: '0.85rem', fontWeight: 'bold', color: 'var(--text-dim)', fontFamily: 'Orbitron' }}>VS</div>
+                        <div className="star-duel-vs-divider">VS</div>
 
                         {/* Away Player Card */}
                         <div 
@@ -594,7 +594,7 @@ const App = () => {
                           }}
                         >
                           <div style={{ fontSize: '1.4rem', marginBottom: '4px' }}>👤</div>
-                          <div style={{ fontSize: '0.82rem', fontWeight: 'bold', fontFamily: 'Orbitron', color: 'var(--text-main)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{awayP.name}</div>
+                          <div style={{ fontSize: 'var(--star-duel-name-size)', fontWeight: 'bold', fontFamily: 'Orbitron', color: 'var(--text-main)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{awayP.name}</div>
                           <div style={{ fontSize: '0.65rem', color: 'var(--accent-color)', marginTop: '2px', fontWeight: 600 }}>{awayP.team}</div>
                           <div style={{ marginTop: '8px', fontSize: '0.72rem', background: 'rgba(255,255,255,0.05)', borderRadius: '4px', padding: '3px 6px', color: 'var(--text-dim)' }}>
                             Rating: <span style={{ color: '#fff', fontWeight: 700 }}>{Math.max(...Object.values(awayP.stats))}%</span>

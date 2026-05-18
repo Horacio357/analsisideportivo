@@ -10,6 +10,12 @@
   --text-dim: #a0a0a0;
   --border-color: rgba(255, 255, 255, 0.1);
   --glass-effect: blur(10px);
+  
+  /* Responsive typography tokens */
+  --team-font-size: 0.9rem;
+  --bar-text-size: 0.7rem;
+  --star-duel-name-size: 0.82rem;
+  --star-duel-title-size: 1.1rem;
 }
 
 [data-theme='modern'] {
@@ -287,6 +293,13 @@ nav button:hover {
 }
 
 @media (max-width: 768px) {
+  :root {
+    --team-font-size: 0.78rem;
+    --bar-text-size: 0.62rem;
+    --star-duel-name-size: 0.75rem;
+    --star-duel-title-size: 0.95rem;
+  }
+
   body {
     text-align: center;
   }
@@ -374,4 +387,50 @@ nav button:hover {
     padding: 15px 0;
     border-bottom: 1px solid rgba(255,255,255,0.05);
   }
+
+  /* Mobile Custom Scaling */
+  .gauge-main-container {
+    flex-direction: column !important;
+    gap: 20px !important;
+    text-align: center;
+  }
+  
+  .star-duel-grid {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+
+  .star-duel-vs-divider {
+    margin: 5px 0 !important;
+  }
+  
+  .radar-container {
+    padding: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+}
+
+/* Custom Responsive Containers */
+.gauge-main-container {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  margin-bottom: 28px;
+}
+
+.star-duel-grid {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 18px;
+}
+
+.star-duel-vs-divider {
+  font-size: 0.85rem;
+  font-weight: bold;
+  color: var(--text-dim);
+  font-family: 'Orbitron', sans-serif;
+  text-align: center;
 }

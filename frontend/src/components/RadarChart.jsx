@@ -20,6 +20,19 @@ ChartJS.register(
 );
 
 const RadarChart = ({ stats, labels, name, color = '#00ff88' }) => {
+  // Hook to check for mobile screens dynamically
+  const [isMobile, setIsMobile] = React.useState(false);
+  React.useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 480);
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const labelSize = isMobile ? 8 : 10;
+
   // Helper to ensure color works with opacity even if it's a CSS variable or hex
   // For simplicity and performance, we'll assume hex colors for now as Chart.js
   // prefers resolved values.
@@ -54,7 +67,7 @@ const RadarChart = ({ stats, labels, name, color = '#00ff88' }) => {
           color: '#fff',
           font: {
             family: 'Orbitron',
-            size: 10,
+            size: labelSize,
           },
         },
         ticks: {

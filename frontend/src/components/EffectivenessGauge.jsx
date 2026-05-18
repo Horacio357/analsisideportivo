@@ -77,6 +77,19 @@ const EffectivenessGauge = ({ league = 'AR' }) => {
   const stats = LEAGUE_STATS[league] || LEAGUE_STATS.AR;
   const count = useCountUp(stats.accuracy, 1500, isInView);
 
+  // Responsive sizing hook for Circular Ring
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 480);
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const ringSize = isMobile ? 120 : 140;
+
   // Color based on accuracy
   const getColor = (acc) => {
     if (acc >= 80) return '#00ff88';
@@ -112,10 +125,10 @@ const EffectivenessGauge = ({ league = 'AR' }) => {
       </div>
 
       {/* Main gauge */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '28px', marginBottom: '28px' }}>
+      <div className="gauge-main-container" style={{ marginBottom: '28px' }}>
         {/* Ring */}
         <div style={{ position: 'relative', flexShrink: 0 }}>
-          <CircularRing value={count} color={color} size={140} strokeWidth={10} />
+          <CircularRing value={count} color={color} size={ringSize} strokeWidth={10} />
           {/* Center text */}
           <div style={{
             position: 'absolute', inset: 0,
