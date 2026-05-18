@@ -12,6 +12,90 @@ import { translations } from './utils/translations';
 import { getPlayersData } from './store/useAppStore';
 import './index.css';
 
+const getTeamLogoPath = (teamName) => {
+  if (!teamName) return null;
+  const name = teamName.toLowerCase().trim();
+  if (name.includes('boca')) return '/escudos/AR/boca.png';
+  if (name.includes('river')) return '/escudos/AR/river.png';
+  if (name.includes('racing')) return '/escudos/AR/racing.png';
+  if (name.includes('independiente')) return '/escudos/AR/independiente.png';
+  if (name.includes('san lorenzo')) return '/escudos/AR/sanlorenzo.png';
+  if (name.includes('huracán') || name.includes('huracan')) return '/escudos/AR/huracan.png';
+  
+  if (name.includes('flamengo')) return '/escudos/BR/flamengo.png';
+  if (name.includes('palmeiras')) return '/escudos/BR/palmeiras.png';
+  if (name.includes('corinthians')) return '/escudos/BR/corinthians.png';
+  if (name.includes('são paulo') || name.includes('sao paulo')) return '/escudos/BR/saopaulo.png';
+  if (name.includes('atletico mg') || name.includes('mineiro')) return '/escudos/BR/atlmineiro.png';
+  if (name.includes('botafogo')) return '/escudos/BR/botafogo.png';
+  
+  if (name.includes('real madrid')) return '/escudos/ES/realmadrid.png';
+  if (name.includes('barcelona')) return '/escudos/ES/barcelona.png';
+  if (name.includes('atlético') || name.includes('atletico madrid')) return '/escudos/ES/atlmadrid.png';
+  if (name.includes('sevilla')) return '/escudos/ES/sevilla.png';
+  if (name.includes('athletic')) return '/escudos/ES/athletic.png';
+  if (name.includes('sociedad')) return '/escudos/ES/realsociedad.png';
+  
+  if (name.includes('man city') || name.includes('manchester city')) return '/escudos/EN/manchestercity.png';
+  if (name.includes('arsenal')) return '/escudos/EN/arsenal.png';
+  if (name.includes('liverpool')) return '/escudos/EN/liverpool.png';
+  if (name.includes('chelsea')) return '/escudos/EN/chelsea.png';
+  if (name.includes('aston villa')) return '/escudos/EN/astonvilla.png';
+  if (name.includes('tottenham')) return '/escudos/EN/tottenham.png';
+  
+  if (name.includes('bayern')) return '/escudos/DE/bayernmunchen.png';
+  if (name.includes('dortmund')) return '/escudos/DE/borussiadortmund.png';
+  if (name.includes('leverkusen')) return '/escudos/DE/bayerleverkusen.png';
+  if (name.includes('leipzig')) return '/escudos/DE/rbleipzig.png';
+  
+  if (name.includes('inter milan') || name.includes('internazionale')) return '/escudos/IT/inter.png';
+  if (name.includes('ac milan') || name.includes('milan')) return '/escudos/IT/milan.png';
+  if (name.includes('juventus')) return '/escudos/IT/juventus.png';
+  if (name.includes('napoli')) return '/escudos/IT/napoli.png';
+  
+  if (name.includes('psg') || name.includes('paris saint')) return '/escudos/FR/psg.png';
+  if (name.includes('lyon')) return '/escudos/FR/olympiquelyon.png';
+  if (name.includes('monaco')) return '/escudos/FR/monaco.png';
+  if (name.includes('marsella') || name.includes('marseille')) return '/escudos/FR/olimpiquemarsella.png';
+  
+  if (name.includes('benfica')) return '/escudos/PT/benfica.png';
+  if (name.includes('porto')) return '/escudos/PT/porto.png';
+  if (name.includes('sporting')) return '/escudos/PT/sporting.png';
+  if (name.includes('braga')) return '/escudos/PT/braga.png';
+  
+  if (name.includes('miami')) return '/escudos/US/intermiami.png';
+  if (name.includes('galaxy')) return '/escudos/US/losangelesgalaxy.png';
+  if (name.includes('red bulls') || name.includes('new york')) return '/escudos/US/newyork.png';
+  if (name.includes('orlando')) return '/escudos/US/orlandocity.png';
+  
+  if (name.includes('américa') || name.includes('america')) return '/escudos/MX/america.png';
+  if (name.includes('cruz azul')) return '/escudos/MX/cruzazul.png';
+  if (name.includes('chivas') || name.includes('guadalajara')) return '/escudos/MX/guadalajara.png';
+  if (name.includes('pumas')) return '/escudos/MX/pumas.png';
+
+  // World Cup / Nations
+  if (name.includes('argentina')) return '/escudos/WC/argentina.png';
+  if (name.includes('jordania')) return '/escudos/WC/arabiasaudita.png';
+  if (name.includes('españa') || name.includes('espana')) return '/escudos/WC/espana.png';
+  if (name.includes('nueva zelanda')) return '/escudos/WC/nuevazelanda.png';
+  if (name.includes('francia')) return '/escudos/WC/francia.png';
+  if (name.includes('uganda')) return '/escudos/WC/senegal.png';
+  if (name.includes('méxico') || name.includes('mexico')) return '/escudos/WC/mexico.png';
+  if (name.includes('suecia')) return '/escudos/WC/suecia.png';
+  if (name.includes('inglaterra')) return '/escudos/WC/inglaterra.png';
+  if (name.includes('ecuador')) return '/escudos/WC/ecuador.png';
+  if (name.includes('brasil')) return '/escudos/WC/brasil.png';
+  if (name.includes('uruguay')) return '/escudos/WC/uruguay.png';
+  if (name.includes('países bajos') || name.includes('paises bajos') || name.includes('holanda')) return '/escudos/WC/paisesbajos.png';
+  if (name.includes('colombia')) return '/escudos/WC/colombia.png';
+  if (name.includes('portugal')) return '/escudos/WC/portugal.png';
+  if (name.includes('croacia')) return '/escudos/WC/croacia.png';
+  if (name.includes('ee.uu.') || name.includes('usa') || name.includes('estados unidos')) return '/escudos/WC/usa.png';
+  if (name.includes('marruecos')) return '/escudos/WC/marruecos.png';
+  
+  return null;
+};
+
 const App = () => {
   const [view, setView] = useState('landing');
   const [lang, setLang] = useState('es');
@@ -102,7 +186,7 @@ const App = () => {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen" style={{ width: '100%', overflowX: 'hidden' }}>
       {loading && (
         <motion.div 
           initial={{ opacity: 1 }}
@@ -162,7 +246,7 @@ const App = () => {
       </header>
 
       {/* League Selector */}
-      <div style={{ padding: '0 20px', marginBottom: '20px' }}>
+      <div className="league-selector-wrapper" style={{ padding: '0 20px', marginBottom: '20px' }}>
         <div className="league-selector-container" style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
           <span style={{ fontSize: '0.7rem', color: 'var(--text-dim)', letterSpacing: '1.5px', fontFamily: 'Orbitron', flexShrink: 0 }}>LIGA</span>
           <div style={{ position: 'relative', flex: '0 0 auto' }}>
@@ -240,10 +324,30 @@ const App = () => {
                   className="match-card"
                   style={{ marginBottom: '15px', padding: '15px', borderLeft: '4px solid var(--accent-color)', background: 'rgba(255,255,255,0.05)' }}
                 >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px', gap: '10px', alignItems: 'center' }}>
-                    <span className="heading-font" style={{ fontSize: 'var(--team-font-size)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '40%' }}>{match.home}</span>
-                    <span style={{ color: 'var(--accent-secondary)', fontSize: '0.78rem' }}>VS</span>
-                    <span className="heading-font" style={{ fontSize: 'var(--team-font-size)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '40%' }}>{match.away}</span>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '14px', gap: '8px', alignItems: 'center' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', maxWidth: '42%' }}>
+                      {getTeamLogoPath(match.home) && (
+                        <img 
+                          src={getTeamLogoPath(match.home)} 
+                          alt={match.home} 
+                          style={{ width: '18px', height: '18px', objectFit: 'contain', flexShrink: 0 }} 
+                        />
+                      )}
+                      <span className="heading-font" style={{ fontSize: 'var(--team-font-size)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{match.home}</span>
+                    </div>
+                    
+                    <span style={{ color: 'var(--accent-secondary)', fontSize: '0.72rem', fontWeight: 'bold', fontFamily: 'Orbitron' }}>VS</span>
+                    
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', maxWidth: '42%', justifyContent: 'flex-end' }}>
+                      <span className="heading-font" style={{ fontSize: 'var(--team-font-size)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{match.away}</span>
+                      {getTeamLogoPath(match.away) && (
+                        <img 
+                          src={getTeamLogoPath(match.away)} 
+                          alt={match.away} 
+                          style={{ width: '18px', height: '18px', objectFit: 'contain', flexShrink: 0 }} 
+                        />
+                      )}
+                    </div>
                   </div>
                   <div style={{ display: 'flex', gap: '10px' }}>
                     <div className="prob-bar">
@@ -566,7 +670,15 @@ const App = () => {
                             boxShadow: isHomeSelected ? '0 0 15px rgba(0,255,136,0.1)' : 'none'
                           }}
                         >
-                          <div style={{ fontSize: '1.4rem', marginBottom: '4px' }}>👤</div>
+                          {getTeamLogoPath(homeP.team) ? (
+                            <img 
+                              src={getTeamLogoPath(homeP.team)} 
+                              alt={homeP.team} 
+                              style={{ width: '24px', height: '24px', objectFit: 'contain', margin: '0 auto 6px', display: 'block', flexShrink: 0 }} 
+                            />
+                          ) : (
+                            <div style={{ fontSize: '1.4rem', marginBottom: '4px' }}>👤</div>
+                          )}
                           <div style={{ fontSize: 'var(--star-duel-name-size)', fontWeight: 'bold', fontFamily: 'Orbitron', color: 'var(--text-main)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{homeP.name}</div>
                           <div style={{ fontSize: '0.65rem', color: 'var(--accent-color)', marginTop: '2px', fontWeight: 600 }}>{homeP.team}</div>
                           <div style={{ marginTop: '8px', fontSize: '0.72rem', background: 'rgba(255,255,255,0.05)', borderRadius: '4px', padding: '3px 6px', color: 'var(--text-dim)' }}>
@@ -593,7 +705,15 @@ const App = () => {
                             boxShadow: isAwaySelected ? '0 0 15px rgba(0,255,136,0.1)' : 'none'
                           }}
                         >
-                          <div style={{ fontSize: '1.4rem', marginBottom: '4px' }}>👤</div>
+                          {getTeamLogoPath(awayP.team) ? (
+                            <img 
+                              src={getTeamLogoPath(awayP.team)} 
+                              alt={awayP.team} 
+                              style={{ width: '24px', height: '24px', objectFit: 'contain', margin: '0 auto 6px', display: 'block', flexShrink: 0 }} 
+                            />
+                          ) : (
+                            <div style={{ fontSize: '1.4rem', marginBottom: '4px' }}>👤</div>
+                          )}
                           <div style={{ fontSize: 'var(--star-duel-name-size)', fontWeight: 'bold', fontFamily: 'Orbitron', color: 'var(--text-main)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{awayP.name}</div>
                           <div style={{ fontSize: '0.65rem', color: 'var(--accent-color)', marginTop: '2px', fontWeight: 600 }}>{awayP.team}</div>
                           <div style={{ marginTop: '8px', fontSize: '0.72rem', background: 'rgba(255,255,255,0.05)', borderRadius: '4px', padding: '3px 6px', color: 'var(--text-dim)' }}>
@@ -754,7 +874,15 @@ const App = () => {
                           #{idx + 1}
                         </div>
                         
-                        <div style={{ fontSize: '1.8rem', margin: '10px 0 5px' }}>👤</div>
+                        {getTeamLogoPath(p.team) ? (
+                          <img 
+                            src={getTeamLogoPath(p.team)} 
+                            alt={p.team} 
+                            style={{ width: '36px', height: '36px', objectFit: 'contain', margin: '10px auto 8px', display: 'block', flexShrink: 0 }} 
+                          />
+                        ) : (
+                          <div style={{ fontSize: '1.8rem', margin: '10px 0 5px' }}>👤</div>
+                        )}
                         <h3 style={{ fontSize: '0.85rem', color: '#fff', fontFamily: 'Orbitron', marginBottom: '3px' }}>{p.name}</h3>
                         <p style={{ fontSize: '0.68rem', color: 'var(--text-dim)' }}>{p.team}</p>
                         
@@ -777,6 +905,7 @@ const App = () => {
         onClose={() => setIsModalOpen(false)} 
         match={selectedMatch}
         t={t}
+        getTeamLogoPath={getTeamLogoPath}
       />
       <SubscriptionModal 
         isOpen={isVipModalOpen} 

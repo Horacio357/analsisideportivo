@@ -2,7 +2,7 @@ import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, BrainCircuit, ShieldAlert, Award, Calendar, HelpCircle, Activity } from 'lucide-react';
 
-const AnalysisModal = ({ isOpen, onClose, match, t, onOpenGlossary }) => {
+const AnalysisModal = ({ isOpen, onClose, match, t, onOpenGlossary, getTeamLogoPath }) => {
   if (!isOpen || !match) return null;
 
   const isAlta = match.confidence === 'ALTA';
@@ -62,13 +62,29 @@ const AnalysisModal = ({ isOpen, onClose, match, t, onOpenGlossary }) => {
         </button>
 
         {/* Modal Header */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyBetween: 'space-between', gap: '15px', marginBottom: '24px', flexWrap: 'wrap' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <BrainCircuit size={36} color="var(--accent-color)" />
-            <div>
-              <h2 className="heading-font" style={{ fontSize: '1.25rem', margin: 0, letterSpacing: '0.5px' }}>
-                {match.home} vs {match.away}
-              </h2>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '15px', marginBottom: '24px', flexWrap: 'wrap', width: '100%' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+            <BrainCircuit size={36} color="var(--accent-color)" style={{ flexShrink: 0 }} />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                {getTeamLogoPath && getTeamLogoPath(match.home) && (
+                  <img 
+                    src={getTeamLogoPath(match.home)} 
+                    alt={match.home} 
+                    style={{ width: '22px', height: '22px', objectFit: 'contain', flexShrink: 0 }} 
+                  />
+                )}
+                <h2 className="heading-font" style={{ fontSize: '1.25rem', margin: 0, letterSpacing: '0.5px', display: 'inline' }}>
+                  {match.home} vs {match.away}
+                </h2>
+                {getTeamLogoPath && getTeamLogoPath(match.away) && (
+                  <img 
+                    src={getTeamLogoPath(match.away)} 
+                    alt={match.away} 
+                    style={{ width: '22px', height: '22px', objectFit: 'contain', flexShrink: 0 }} 
+                  />
+                )}
+              </div>
               <span style={{ fontSize: '0.72rem', color: 'var(--text-dim)', letterSpacing: '1px', fontFamily: 'Orbitron' }}>
                 ⚽ {match.group_name || 'Liga Regular'}
               </span>

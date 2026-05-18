@@ -301,7 +301,11 @@ nav button:hover {
   }
 
   body {
-    text-align: center;
+    text-align: left;
+  }
+
+  .league-selector-wrapper {
+    padding: 0 15px !important;
   }
 
   .glass-panel {
