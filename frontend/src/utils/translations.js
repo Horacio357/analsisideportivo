@@ -13,7 +13,8 @@ export const translations = {
       classic: "PES Clásico",
       modern: "eFootball Moderno",
       elite: "Oro Élite"
-    }
+    },
+    disclaimer: "Aviso Legal: Este sistema está diseñado exclusivamente para optimizar la toma de decisiones mediante el análisis de datos deportivos. No nos responsabilizamos por las acciones y/o decisiones que los usuarios tomen fuera de esta plataforma. BET AI no funciona ni coopera con ninguna plataforma o casa de apuestas; su única finalidad es unificar y analizar estadísticas deportivas."
   },
   en: {
     welcome: "WELCOME TO BET AI",
@@ -29,7 +30,8 @@ export const translations = {
       classic: "Classic PES",
       modern: "Modern eFootball",
       elite: "Gold Elite"
-    }
+    },
+    disclaimer: "Disclaimer: This system is designed exclusively to optimize decision-making through sports data analysis. We are not responsible for any actions and/or decisions taken by users outside of this platform. BET AI does not operate or cooperate with any betting platforms or sportsbooks; its sole purpose is to unify and analyze sports statistics."
   },
   pt: {
     welcome: "BEM-VINDO AO BET AI",
@@ -45,6 +47,7 @@ export const translations = {
       classic: "PES Clássico",
       modern: "eFootball Moderno",
       elite: "Ouro Elite"
-    }
+    },
+    disclaimer: "Aviso Legal: Este sistema foi projetado exclusivamente para otimizar a tomada de decisões por meio da análise de dados esportivos. Não nos responsabilizamos pelas ações e/ou decisões tomadas pelos usuários fora desta plataforma. O BET AI não funciona nem coopera com nenhuma plataforma ou casa de apostas; sua única finalidade é unificar e analisar estatísticas esportivas."
   }
 };

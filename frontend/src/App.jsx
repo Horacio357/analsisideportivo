@@ -9,6 +9,7 @@ import AnalysisModal from './components/AnalysisModal';
 import SubscriptionModal from './components/SubscriptionModal';
 import EffectivenessGauge from './components/EffectivenessGauge';
 import { translations } from './utils/translations';
+import { getPlayersData } from './store/useAppStore';
 import './index.css';
 
 const App = () => {
@@ -29,11 +30,7 @@ const App = () => {
 
   const t = translations[lang];
 
-  const players = [
-    { name: 'EDINSON CAVANI', team: 'Boca Juniors', stats: { shooting: 88, passing: 75, dribbling: 72, physical: 80, defense: 45, speed: 76 }, bio: 'Rendimiento estable. Probabilidad de gol: 72%' },
-    { name: 'MIGUEL BORJA', team: 'River Plate', stats: { shooting: 90, passing: 68, dribbling: 70, physical: 85, defense: 30, speed: 74 }, bio: 'Goleador nato. Probabilidad de gol: 85%' },
-    { name: 'JUANFER QUINTERO', team: 'Racing Club', stats: { shooting: 82, passing: 92, dribbling: 88, physical: 65, defense: 35, speed: 70 }, bio: 'Visión de juego élite. Probabilidad de asistencia: 78%' }
-  ];
+  const players = getPlayersData(league);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -227,219 +224,553 @@ const App = () => {
       </div>
 
       <main className="dashboard-grid">
-        {/* Prediction Cards */}
-        <section className="glass-panel">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
-            <BrainCircuit color="var(--accent-color)" />
-            <h2 className="heading-font">IA Predictions</h2>
-          </div>
-          {matches.map(match => (
-            <motion.div 
-              key={match.id}
-              initial={{ x: -20, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              className="match-card"
-              style={{ marginBottom: '15px', padding: '15px', borderLeft: '4px solid var(--accent-color)', background: 'rgba(255,255,255,0.05)' }}
-            >
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
-                <span className="heading-font" style={{ fontSize: '0.9rem' }}>{match.home}</span>
-                <span style={{ color: 'var(--accent-secondary)' }}>VS</span>
-                <span className="heading-font" style={{ fontSize: '0.9rem' }}>{match.away}</span>
+        {activeTab === 'predictions' ? (
+          <>
+            {/* Prediction Cards */}
+            <section className="glass-panel">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
+                <BrainCircuit color="var(--accent-color)" />
+                <h2 className="heading-font">IA Predictions</h2>
               </div>
-              <div style={{ display: 'flex', gap: '10px' }}>
-                <div className="prob-bar">
-                  <div style={{ width: `${match.homeProb}%`, background: 'var(--accent-color)' }}></div>
-                  <span style={{ fontSize: '0.7rem' }}>L: {match.homeProb}%</span>
-                </div>
-                <div className="prob-bar">
-                  <div style={{ width: `${match.drawProb}%`, background: '#888' }}></div>
-                  <span style={{ fontSize: '0.7rem' }}>E: {match.drawProb}%</span>
-                </div>
-                <div className="prob-bar">
-                  <div style={{ width: `${match.awayProb}%`, background: '#ff4444' }}></div>
-                  <span style={{ fontSize: '0.7rem' }}>V: {match.awayProb}%</span>
-                </div>
-              </div>
-              <button 
-                className="pes-button" 
-                style={{ width: '100%', marginTop: '10px', padding: '8px' }}
-                onClick={() => {
-                  setSelectedMatch(match);
-                  setIsModalOpen(true);
-                }}
-              >
-                {t.analyzePro}
-              </button>
-            </motion.div>
-          ))}
-        </section>
-
-        {/* ── Unified Analysis Panel ── */}
-        <section className="glass-panel">
-          {/* Toggle header */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px', flexWrap: 'wrap', gap: '20px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', width: '100%', justifyContent: 'center' }} className="mobile-only-header">
-              {analysisMode === 'team' ? <Trophy color="var(--accent-secondary)" size={20} /> : <Users color="var(--accent-color)" size={20} />}
-              <h2 className="heading-font" style={{ fontSize: '1rem' }}>ANÁLISIS</h2>
-            </div>
-            {/* Mode toggle pills */}
-            <div style={{ display: 'flex', background: 'rgba(255,255,255,0.05)', borderRadius: '10px', padding: '4px', gap: '4px', margin: '0 auto' }}>
-              {[{ id: 'team', label: '🏟️ Equipo' }, { id: 'player', label: '👤 Jugador' }].map(m => (
-                <button
-                  key={m.id}
-                  onClick={() => setAnalysisMode(m.id)}
-                  style={{
-                    padding: '7px 16px',
-                    borderRadius: '7px',
-                    border: 'none',
-                    cursor: 'pointer',
-                    fontSize: '0.78rem',
-                    fontFamily: 'Orbitron, sans-serif',
-                    letterSpacing: '0.5px',
-                    transition: 'all 0.2s',
-                    background: analysisMode === m.id
-                      ? (m.id === 'team' ? 'var(--accent-secondary)' : 'var(--accent-color)')
-                      : 'transparent',
-                    color: analysisMode === m.id ? '#000' : 'var(--text-dim)',
-                    fontWeight: analysisMode === m.id ? 700 : 400,
-                  }}
+              {matches.map(match => (
+                <motion.div 
+                  key={match.id}
+                  initial={{ x: -20, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  className="match-card"
+                  style={{ marginBottom: '15px', padding: '15px', borderLeft: '4px solid var(--accent-color)', background: 'rgba(255,255,255,0.05)' }}
                 >
-                  {m.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* ── TEAM VIEW ── */}
-          {analysisMode === 'team' && (() => {
-            const teamData = {
-              AR: { name: 'Boca Juniors', stats: [85, 78, 92, 80, 75, 88], color: '#ffd700', form: 'VVEVP', goals: 28, conceded: 12, possession: '58%', wins: 14 },
-              BR: { name: 'Flamengo',     stats: [88, 82, 80, 85, 78, 90], color: '#ff4444', form: 'VVVEP', goals: 34, conceded: 15, possession: '61%', wins: 16 },
-              EU: { name: 'Real Madrid',  stats: [95, 90, 85, 92, 98, 95], color: '#ffd700', form: 'VVVVV', goals: 52, conceded: 18, possession: '63%', wins: 22 },
-              ES: { name: 'Real Madrid',  stats: [94, 88, 87, 91, 96, 93], color: '#ffd700', form: 'VVEVV', goals: 48, conceded: 20, possession: '62%', wins: 20 },
-              EN: { name: 'Man City',     stats: [92, 86, 90, 88, 94, 80], color: '#6ec6ff', form: 'VEVVV', goals: 45, conceded: 19, possession: '65%', wins: 19 },
-              DE: { name: 'Bayern Munich',stats: [96, 84, 88, 90, 92, 82], color: '#ff4444', form: 'VVVPV', goals: 58, conceded: 22, possession: '64%', wins: 21 },
-              IT: { name: 'Inter Milan',  stats: [88, 90, 80, 86, 88, 75], color: '#6ec6ff', form: 'VVEVV', goals: 40, conceded: 16, possession: '57%', wins: 18 },
-              US: { name: 'Inter Miami',  stats: [92, 65, 88, 70, 72, 60], color: '#ff69b4', form: 'VVVEV', goals: 36, conceded: 24, possession: '55%', wins: 15 },
-              MX: { name: 'Club América', stats: [85, 80, 78, 82, 80, 72], color: '#ffd700', form: 'VPVVV', goals: 32, conceded: 18, possession: '56%', wins: 14 },
-            };
-            const team = teamData[league] || teamData.AR;
-            const formColors = { V: 'var(--accent-color)', E: '#888', P: '#ff4444' };
-            const formLabels = { V: 'V', E: 'E', P: 'P' };
-            return (
-              <motion.div key={league} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
-                <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-                  <h3 style={{ color: team.color, fontFamily: 'Orbitron', fontSize: '1.1rem', marginBottom: '4px' }}>{team.name}</h3>
-                  <p style={{ color: 'var(--text-dim)', fontSize: '0.75rem', letterSpacing: '1px' }}>MÉTRICAS DE RENDIMIENTO</p>
-                </div>
-                <RadarChart stats={team.stats} labels={['Ataque', 'Defensa', 'Posesión', 'Físico', 'Táctica', 'Cantera']} name={team.name} color={team.color} />
-                {/* Stat cards */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginTop: '20px' }}>
-                  {[
-                    { label: 'Goles a favor', value: team.goals },
-                    { label: 'Goles en contra', value: team.conceded },
-                    { label: 'Posesión media', value: team.possession },
-                    { label: 'Victorias', value: team.wins },
-                  ].map((s, i) => (
-                    <div key={i} style={{ background: 'rgba(255,255,255,0.04)', borderRadius: '10px', padding: '12px', textAlign: 'center', border: `1px solid ${team.color}22` }}>
-                      <div style={{ fontSize: '1.3rem', fontWeight: 900, fontFamily: 'Orbitron', color: team.color }}>{s.value}</div>
-                      <div style={{ fontSize: '0.68rem', color: 'var(--text-dim)', marginTop: '3px' }}>{s.label}</div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
+                    <span className="heading-font" style={{ fontSize: '0.9rem' }}>{match.home}</span>
+                    <span style={{ color: 'var(--accent-secondary)' }}>VS</span>
+                    <span className="heading-font" style={{ fontSize: '0.9rem' }}>{match.away}</span>
+                  </div>
+                  <div style={{ display: 'flex', gap: '10px' }}>
+                    <div className="prob-bar">
+                      <div style={{ width: `${match.homeProb}%`, background: 'var(--accent-color)' }}></div>
+                      <span style={{ fontSize: '0.7rem' }}>L: {match.homeProb}%</span>
                     </div>
+                    <div className="prob-bar">
+                      <div style={{ width: `${match.drawProb}%`, background: '#888' }}></div>
+                      <span style={{ fontSize: '0.7rem' }}>E: {match.drawProb}%</span>
+                    </div>
+                    <div className="prob-bar">
+                      <div style={{ width: `${match.awayProb}%`, background: '#ff4444' }}></div>
+                      <span style={{ fontSize: '0.7rem' }}>V: {match.awayProb}%</span>
+                    </div>
+                  </div>
+                  <button 
+                    className="pes-button" 
+                    style={{ width: '100%', marginTop: '10px', padding: '8px' }}
+                    onClick={() => {
+                      setSelectedMatch(match);
+                      setIsModalOpen(true);
+                    }}
+                  >
+                    {t.analyzePro}
+                  </button>
+                </motion.div>
+              ))}
+            </section>
+
+            {/* ── Unified Analysis Panel ── */}
+            <section className="glass-panel">
+              {/* Toggle header */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px', flexWrap: 'wrap', gap: '20px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', width: '100%', justifyContent: 'center' }} className="mobile-only-header">
+                  {analysisMode === 'team' ? <Trophy color="var(--accent-secondary)" size={20} /> : <Users color="var(--accent-color)" size={20} />}
+                  <h2 className="heading-font" style={{ fontSize: '1rem' }}>ANÁLISIS</h2>
+                </div>
+                {/* Mode toggle pills */}
+                <div style={{ display: 'flex', background: 'rgba(255,255,255,0.05)', borderRadius: '10px', padding: '4px', gap: '4px', margin: '0 auto' }}>
+                  {[{ id: 'team', label: '🏟️ Equipo' }, { id: 'player', label: '👤 Jugador' }].map(m => (
+                    <button
+                      key={m.id}
+                      onClick={() => setAnalysisMode(m.id)}
+                      style={{
+                        padding: '7px 16px',
+                        borderRadius: '7px',
+                        border: 'none',
+                        cursor: 'pointer',
+                        fontSize: '0.78rem',
+                        fontFamily: 'Orbitron, sans-serif',
+                        letterSpacing: '0.5px',
+                        transition: 'all 0.2s',
+                        background: analysisMode === m.id
+                          ? (m.id === 'team' ? 'var(--accent-secondary)' : 'var(--accent-color)')
+                          : 'transparent',
+                        color: analysisMode === m.id ? '#000' : 'var(--text-dim)',
+                        fontWeight: analysisMode === m.id ? 700 : 400,
+                      }}
+                    >
+                      {m.label}
+                    </button>
                   ))}
                 </div>
-                {/* Form strip */}
-                <div style={{ marginTop: '18px' }}>
-                  <div style={{ fontSize: '0.68rem', color: 'var(--text-dim)', letterSpacing: '1px', marginBottom: '8px' }}>ÚLTIMOS 5 PARTIDOS</div>
-                  <div style={{ display: 'flex', gap: '8px' }}>
-                    {team.form.split('').map((r, i) => (
-                      <div key={i} style={{ width: '36px', height: '36px', borderRadius: '8px', background: formColors[r], display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.85rem', color: '#000' }}>{formLabels[r]}</div>
+              </div>
+
+              {/* ── TEAM VIEW ── */}
+              {analysisMode === 'team' && (() => {
+                const teamData = {
+                  AR: { name: 'Boca Juniors', stats: [88, 82, 75, 78, 85, 80], color: '#3b82f6', form: 'VVEEV', goals: 28, conceded: 12, possession: '54%', wins: 12 },
+                  BR: { name: 'Flamengo', stats: [90, 85, 80, 82, 88, 75], color: '#ef4444', form: 'VVEVV', goals: 34, conceded: 15, possession: '58%', wins: 15 },
+                  EU: { name: 'Real Madrid', stats: [95, 90, 88, 85, 92, 80], color: '#f59e0b', form: 'VVVVV', goals: 42, conceded: 10, possession: '60%', wins: 18 },
+                  WC: { name: 'Argentina', stats: [94, 88, 92, 86, 95, 85], color: '#00c6ff', form: 'VVVVV', goals: 38, conceded: 8, possession: '62%', wins: 16 },
+                  ES: { name: 'Real Madrid', stats: [95, 90, 88, 85, 92, 80], color: '#f59e0b', form: 'VVVVV', goals: 42, conceded: 10, possession: '60%', wins: 18 },
+                  EN: { name: 'Manchester City', stats: [96, 88, 95, 84, 94, 82], color: '#00c6ff', form: 'VVEVV', goals: 45, conceded: 14, possession: '64%', wins: 17 },
+                  DE: { name: 'Bayern Munich', stats: [92, 84, 85, 88, 90, 78], color: '#ef4444', form: 'VVVEV', goals: 39, conceded: 16, possession: '59%', wins: 14 },
+                  IT: { name: 'Inter Milan', stats: [90, 92, 82, 86, 88, 74], color: '#3b82f6', form: 'VEVVV', goals: 31, conceded: 11, possession: '55%', wins: 13 },
+                  US: { name: 'Inter Miami', stats: [84, 72, 80, 76, 82, 70], color: '#ff44aa', form: 'VEVVE', goals: 29, conceded: 22, possession: '53%', wins: 11 },
+                  MX: { name: 'Club América', stats: [85, 80, 78, 82, 80, 72], color: '#ffd700', form: 'VPVVV', goals: 32, conceded: 18, possession: '56%', wins: 14 },
+                };
+                const team = teamData[league] || teamData.AR;
+                const formColors = { V: 'var(--accent-color)', E: '#888', P: '#ff4444' };
+                const formLabels = { V: 'V', E: 'E', P: 'P' };
+                return (
+                  <motion.div key={league} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
+                    <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+                      <h3 style={{ color: team.color, fontFamily: 'Orbitron', fontSize: '1.1rem', marginBottom: '4px' }}>{team.name}</h3>
+                      <p style={{ color: 'var(--text-dim)', fontSize: '0.75rem', letterSpacing: '1px' }}>MÉTRICAS DE RENDIMIENTO</p>
+                    </div>
+                    <RadarChart stats={team.stats} labels={['Ataque', 'Defensa', 'Posesión', 'Físico', 'Táctica', 'Cantera']} name={team.name} color={team.color} />
+                    {/* Stat cards */}
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginTop: '20px' }}>
+                      {[
+                        { label: 'Goles a favor', value: team.goals },
+                        { label: 'Goles en contra', value: team.conceded },
+                        { label: 'Posesión media', value: team.possession },
+                        { label: 'Victorias', value: team.wins },
+                      ].map((s, i) => (
+                        <div key={i} style={{ background: 'rgba(255,255,255,0.04)', borderRadius: '10px', padding: '12px', textAlign: 'center', border: `1px solid ${team.color}22` }}>
+                          <div style={{ fontSize: '1.3rem', fontWeight: 900, fontFamily: 'Orbitron', color: team.color }}>{s.value}</div>
+                          <div style={{ fontSize: '0.68rem', color: 'var(--text-dim)', marginTop: '3px' }}>{s.label}</div>
+                        </div>
+                      ))}
+                    </div>
+                    {/* Form strip */}
+                    <div style={{ marginTop: '18px' }}>
+                      <div style={{ fontSize: '0.68rem', color: 'var(--text-dim)', letterSpacing: '1px', marginBottom: '8px' }}>ÚLTIMOS 5 PARTIDOS</div>
+                      <div style={{ display: 'flex', gap: '8px' }}>
+                        {team.form.split('').map((r, i) => (
+                          <div key={i} style={{ width: '36px', height: '36px', borderRadius: '8px', background: formColors[r], display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.85rem', color: '#000' }}>{formLabels[r]}</div>
+                        ))}
+                      </div>
+                    </div>
+                  </motion.div>
+                );
+              })()}
+
+              {/* ── PLAYER VIEW ── */}
+              {analysisMode === 'player' && (
+                <motion.div key="player" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
+                  {/* Player selector */}
+                  <select
+                    value={selectedPlayer}
+                    onChange={e => setSelectedPlayer(Number(e.target.value))}
+                    style={{
+                      width: '100%', marginBottom: '20px',
+                      background: '#0d1117', color: '#fff',
+                      border: '1px solid var(--accent-color)',
+                      borderRadius: '10px', padding: '10px 16px',
+                      fontSize: '0.9rem', fontFamily: 'Outfit, sans-serif',
+                      cursor: 'pointer', outline: 'none',
+                    }}
+                  >
+                    {players.map((p, i) => (
+                      <option key={i} value={i} style={{ background: '#0d1117', padding: '8px', lineHeight: '2' }}>
+                        {p.name} — {p.team}
+                      </option>
+                    ))}
+                  </select>
+
+                  {/* Player card */}
+                  <div style={{ textAlign: 'center', marginBottom: '16px' }}>
+                    <h3 style={{ color: 'var(--accent-color)', fontFamily: 'Orbitron', fontSize: '1rem', marginBottom: '2px' }}>{players[selectedPlayer]?.name}</h3>
+                    <p style={{ color: 'var(--text-dim)', fontSize: '0.75rem', letterSpacing: '1px' }}>{players[selectedPlayer]?.team}</p>
+                  </div>
+                  <RadarChart stats={Object.values(players[selectedPlayer]?.stats || {})} name={players[selectedPlayer]?.name || ''} color="#00ff88" />
+
+                  {/* Individual stat bars */}
+                  <div style={{ marginTop: '20px' }}>
+                    {Object.entries(players[selectedPlayer]?.stats || {}).map(([key, val], i) => (
+                      <div key={key} style={{ marginBottom: '12px' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', marginBottom: '5px' }}>
+                          <span style={{ color: 'var(--text-dim)', textTransform: 'capitalize' }}>{key}</span>
+                          <span style={{ color: 'var(--accent-color)', fontWeight: 700 }}>{val}</span>
+                        </div>
+                        <div style={{ height: '5px', background: 'rgba(255,255,255,0.07)', borderRadius: '3px', overflow: 'hidden' }}>
+                          <motion.div
+                            initial={{ width: 0 }}
+                            animate={{ width: `${val}%` }}
+                            transition={{ duration: 0.8, ease: 'easeOut', delay: i * 0.08 }}
+                            style={{ height: '100%', background: `linear-gradient(90deg, #00ff8866, #00ff88)`, borderRadius: '3px' }}
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div style={{ marginTop: '16px', padding: '12px 16px', background: 'rgba(0,255,136,0.05)', borderRadius: '10px', border: '1px solid rgba(0,255,136,0.15)', fontSize: '0.82rem', color: 'var(--text-dim)', lineHeight: 1.6 }}>
+                    💡 {players[selectedPlayer]?.bio}
+                  </div>
+                </motion.div>
+              )}
+            </section>
+
+            {/* Recent Performance Section */}
+            <section className="glass-panel">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
+                <Activity color="var(--accent-color)" />
+                <h2 className="heading-font">Racha Equipos</h2>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                {['Boca Juniors', 'River Plate', 'Racing Club', 'Independiente'].map(team => (
+                  <div key={team} className="streak-item">
+                    <span>{team}</span>
+                    <div className="dots">
+                      <span className="dot win">W</span>
+                      <span className="dot win">W</span>
+                      <span className="dot draw">D</span>
+                      <span className="dot win">W</span>
+                      <span className="dot loss">L</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+            {/* Effectiveness Gauge */}
+            <EffectivenessGauge league={league} />
+          </>
+        ) : (() => {
+          // PLAYER ANALYSIS DASHBOARD VIEW
+          const currentPlayer = players[selectedPlayer] || players[0] || { name: 'LIONEL MESSI', team: 'Argentina', stats: { shooting: 94, passing: 96, dribbling: 95, physical: 70, defense: 35, speed: 82 }, bio: 'Cargando...' };
+          
+          // Helper to dynamically match players for the duel
+          const getMatchPlayers = (match, playersArray) => {
+            let homeP = playersArray.find(p => p.team.toLowerCase() === match.home.toLowerCase());
+            let awayP = playersArray.find(p => p.team.toLowerCase() === match.away.toLowerCase());
+            
+            if (!homeP) {
+              if (match.home.includes('Esp') || match.home.includes('Spain')) {
+                homeP = playersArray.find(p => p.name.includes('YAMAL')) || playersArray[2];
+              } else if (match.home.includes('Fran') || match.home.includes('France')) {
+                homeP = playersArray.find(p => p.name.includes('MBAPPÉ')) || playersArray[1];
+              } else if (match.home.includes('Ing') || match.home.includes('England')) {
+                homeP = playersArray.find(p => p.name.includes('BELLINGHAM')) || playersArray[4];
+              } else if (match.home.includes('Bra') || match.home.includes('Brazil')) {
+                homeP = playersArray.find(p => p.name.includes('VINICIUS')) || playersArray[3];
+              } else if (match.home.includes('Méx') || match.home.includes('Mexico')) {
+                homeP = playersArray.find(p => p.name.includes('GIMÉNEZ')) || playersArray[5];
+              } else {
+                homeP = playersArray[0] || { name: 'Player A', team: match.home, stats: { shooting: 80, passing: 80, dribbling: 80, physical: 80, defense: 80, speed: 80 }, bio: '' };
+              }
+            }
+            
+            if (!awayP) {
+              if (match.away.includes('Jor') || match.away.includes('Jordan')) {
+                awayP = playersArray.find(p => p.name.includes('TAMARI')) || playersArray[playersArray.length - 1];
+              } else if (match.away.includes('Uru') || match.away.includes('Uruguay')) {
+                awayP = playersArray.find(p => p.name.includes('VALVERDE')) || playersArray[3];
+              } else if (match.away.includes('Col') || match.away.includes('Colombia')) {
+                awayP = playersArray.find(p => p.name.includes('DÍAZ')) || playersArray[7];
+              } else if (match.away.includes('Cro') || match.away.includes('Croatia')) {
+                awayP = playersArray.find(p => p.name.includes('MODRIC')) || playersArray[6];
+              } else if (match.away.includes('Mar') || match.away.includes('Morocco')) {
+                awayP = playersArray.find(p => p.name.includes('HAKIMI')) || playersArray[7];
+              } else if (match.away.includes('Sue') || match.away.includes('Sweden')) {
+                awayP = playersArray.find(p => p.name.includes('GIMÉNEZ')) || playersArray[5];
+              } else {
+                awayP = playersArray[Math.min(1, playersArray.length - 1)] || { name: 'Player B', team: match.away, stats: { shooting: 75, passing: 75, dribbling: 75, physical: 75, defense: 75, speed: 75 }, bio: '' };
+              }
+            }
+            
+            return { homeP, awayP };
+          };
+
+          return (
+            <>
+              {/* Left Column: Key Players & Star Duels per Match */}
+              <section className="glass-panel" style={{ position: 'relative' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '24px' }}>
+                  <Users color="var(--accent-color)" />
+                  <h2 className="heading-font" style={{ fontSize: '1.1rem', letterSpacing: '0.5px' }}>Duelos de Estrellas</h2>
+                </div>
+
+                {loading ? (
+                  <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
+                    <div className="pes-spinner"></div>
+                  </div>
+                ) : matches.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--text-dim)' }}>
+                    No hay partidos cargados para esta liga.
+                  </div>
+                ) : matches.map(match => {
+                  const { homeP, awayP } = getMatchPlayers(match, players);
+                  const isHomeSelected = currentPlayer.name === homeP.name;
+                  const isAwaySelected = currentPlayer.name === awayP.name;
+
+                  return (
+                    <motion.div 
+                      key={match.id}
+                      initial={{ x: -20, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      className="match-card"
+                      style={{ 
+                        marginBottom: '20px', 
+                        padding: '20px', 
+                        borderLeft: `4px solid ${isHomeSelected || isAwaySelected ? 'var(--accent-color)' : 'rgba(255,255,255,0.1)'}`, 
+                        background: 'rgba(255,255,255,0.02)',
+                        borderRadius: '12px',
+                        border: '1px solid rgba(255,255,255,0.03)',
+                        boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+                        transition: 'all 0.2s'
+                      }}
+                      whileHover={{ translateY: '-2px', boxShadow: '0 8px 30px rgba(0,0,0,0.3)' }}
+                    >
+                      {/* Matchday / Group Header */}
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+                        <span style={{ fontSize: '0.72rem', color: 'var(--text-dim)', fontFamily: 'Outfit' }}>
+                          ⚽ {match.group_name || 'Jornada actual'}
+                        </span>
+                        <span style={{ 
+                          fontSize: '0.62rem', 
+                          fontWeight: 'bold', 
+                          color: 'var(--accent-color)', 
+                          background: 'rgba(0, 255, 136, 0.12)', 
+                          border: '1px solid rgba(0, 255, 136, 0.25)',
+                          padding: '3px 10px', 
+                          borderRadius: '20px', 
+                          fontFamily: 'Orbitron',
+                          letterSpacing: '1px',
+                          boxShadow: '0 0 10px rgba(0, 255, 136, 0.1)'
+                        }}>
+                          DUELO DE ESTRELLAS
+                        </span>
+                      </div>
+
+                      {/* Duel details */}
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', alignItems: 'center', gap: '15px', marginBottom: '18px' }}>
+                        {/* Home Player Card */}
+                        <div 
+                          onClick={() => {
+                            const idx = players.findIndex(p => p.name === homeP.name);
+                            if (idx !== -1) setSelectedPlayer(idx);
+                          }}
+                          style={{ 
+                            background: isHomeSelected ? 'rgba(0,255,136,0.04)' : 'rgba(255,255,255,0.02)', 
+                            border: `1px solid ${isHomeSelected ? 'var(--accent-color)' : 'rgba(255,255,255,0.05)'}`,
+                            borderRadius: '10px', 
+                            padding: '12px', 
+                            textAlign: 'center',
+                            cursor: 'pointer',
+                            transition: 'all 0.2s',
+                            boxShadow: isHomeSelected ? '0 0 15px rgba(0,255,136,0.1)' : 'none'
+                          }}
+                        >
+                          <div style={{ fontSize: '1.4rem', marginBottom: '4px' }}>👤</div>
+                          <div style={{ fontSize: '0.82rem', fontWeight: 'bold', fontFamily: 'Orbitron', color: 'var(--text-main)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{homeP.name}</div>
+                          <div style={{ fontSize: '0.65rem', color: 'var(--accent-color)', marginTop: '2px', fontWeight: 600 }}>{homeP.team}</div>
+                          <div style={{ marginTop: '8px', fontSize: '0.72rem', background: 'rgba(255,255,255,0.05)', borderRadius: '4px', padding: '3px 6px', color: 'var(--text-dim)' }}>
+                            Rating: <span style={{ color: '#fff', fontWeight: 700 }}>{Math.max(...Object.values(homeP.stats))}%</span>
+                          </div>
+                        </div>
+
+                        <div style={{ fontSize: '0.85rem', fontWeight: 'bold', color: 'var(--text-dim)', fontFamily: 'Orbitron' }}>VS</div>
+
+                        {/* Away Player Card */}
+                        <div 
+                          onClick={() => {
+                            const idx = players.findIndex(p => p.name === awayP.name);
+                            if (idx !== -1) setSelectedPlayer(idx);
+                          }}
+                          style={{ 
+                            background: isAwaySelected ? 'rgba(0,255,136,0.04)' : 'rgba(255,255,255,0.02)', 
+                            border: `1px solid ${isAwaySelected ? 'var(--accent-color)' : 'rgba(255,255,255,0.05)'}`,
+                            borderRadius: '10px', 
+                            padding: '12px', 
+                            textAlign: 'center',
+                            cursor: 'pointer',
+                            transition: 'all 0.2s',
+                            boxShadow: isAwaySelected ? '0 0 15px rgba(0,255,136,0.1)' : 'none'
+                          }}
+                        >
+                          <div style={{ fontSize: '1.4rem', marginBottom: '4px' }}>👤</div>
+                          <div style={{ fontSize: '0.82rem', fontWeight: 'bold', fontFamily: 'Orbitron', color: 'var(--text-main)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{awayP.name}</div>
+                          <div style={{ fontSize: '0.65rem', color: 'var(--accent-color)', marginTop: '2px', fontWeight: 600 }}>{awayP.team}</div>
+                          <div style={{ marginTop: '8px', fontSize: '0.72rem', background: 'rgba(255,255,255,0.05)', borderRadius: '4px', padding: '3px 6px', color: 'var(--text-dim)' }}>
+                            Rating: <span style={{ color: '#fff', fontWeight: 700 }}>{Math.max(...Object.values(awayP.stats))}%</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Analysis quick recommendation */}
+                      <div style={{ background: 'rgba(0,255,136,0.03)', border: '1px solid rgba(0,255,136,0.08)', borderRadius: '8px', padding: '8px 12px', fontSize: '0.72rem', color: 'var(--text-dim)', lineHeight: 1.4, marginBottom: '12px' }}>
+                        💡 <span style={{ color: '#fff', fontWeight: 600 }}>AI Proyección:</span> {homeP.name} tiene un {Math.max(...Object.values(homeP.stats))}% de probabilidad de dominar el área frente a la defensa de {awayP.team}.
+                      </div>
+
+                      {/* Action Button */}
+                      <button 
+                        className="pes-button" 
+                        style={{ width: '100%', padding: '8px', fontSize: '0.7rem', letterSpacing: '0.5px' }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          const idx = players.findIndex(p => p.name === homeP.name);
+                          if (idx !== -1) {
+                            setSelectedPlayer(idx);
+                            const radarElement = document.querySelector('.radar-container');
+                            if (radarElement) {
+                              radarElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            }
+                          }
+                        }}
+                      >
+                        📊 VER ANÁLISIS EN RADAR
+                      </button>
+                    </motion.div>
+                  );
+                })}
+              </section>
+
+              {/* Right Column: Interactive Radar & Tactical AI Insights */}
+              <section className="glass-panel" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px', justifyContent: 'center' }}>
+                    <BrainCircuit color="var(--accent-color)" />
+                    <h2 className="heading-font" style={{ fontSize: '1.1rem' }}>ANALIZADOR DE IA TÁCTICO</h2>
+                  </div>
+
+                  {/* Player header */}
+                  <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+                    <div style={{ fontSize: '2.5rem', marginBottom: '8px' }}>👤</div>
+                    <h3 style={{ color: 'var(--accent-color)', fontFamily: 'Orbitron', fontSize: '1.2rem', marginBottom: '4px' }}>{currentPlayer.name}</h3>
+                    <p style={{ color: 'var(--text-dim)', fontSize: '0.78rem', letterSpacing: '1px' }}>{currentPlayer.team}</p>
+                  </div>
+
+                  {/* Radar Chart */}
+                  <div className="radar-container" style={{ margin: '20px auto' }}>
+                    <RadarChart stats={Object.values(currentPlayer.stats)} name={currentPlayer.name} color="var(--accent-color)" />
+                  </div>
+
+                  {/* Individual stat bars */}
+                  <div style={{ marginTop: '20px' }}>
+                    {Object.entries(currentPlayer.stats).map(([key, val], i) => (
+                      <div key={key} style={{ marginBottom: '12px' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', marginBottom: '5px' }}>
+                          <span style={{ color: 'var(--text-dim)', textTransform: 'capitalize' }}>
+                            {key === 'shooting' ? 'Tiro' : 
+                             key === 'passing' ? 'Pase' : 
+                             key === 'dribbling' ? 'Regate' : 
+                             key === 'physical' ? 'Físico' : 
+                             key === 'defense' ? 'Defensa' : 
+                             key === 'speed' ? 'Velocidad' : key}
+                          </span>
+                          <span style={{ color: 'var(--accent-color)', fontWeight: 700 }}>{val}</span>
+                        </div>
+                        <div style={{ height: '5px', background: 'rgba(255,255,255,0.07)', borderRadius: '3px', overflow: 'hidden' }}>
+                          <motion.div
+                            initial={{ width: 0 }}
+                            animate={{ width: `${val}%` }}
+                            transition={{ duration: 0.8, ease: 'easeOut', delay: i * 0.08 }}
+                            style={{ height: '100%', background: `linear-gradient(90deg, rgba(0,255,136,0.4), var(--accent-color))`, borderRadius: '3px' }}
+                          />
+                        </div>
+                      </div>
                     ))}
                   </div>
                 </div>
-              </motion.div>
-            );
-          })()}
 
-          {/* ── PLAYER VIEW ── */}
-          {analysisMode === 'player' && (
-            <motion.div key="player" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
-              {/* Player selector */}
-              <select
-                value={selectedPlayer}
-                onChange={e => setSelectedPlayer(Number(e.target.value))}
-                style={{
-                  width: '100%', marginBottom: '20px',
-                  background: '#0d1117', color: '#fff',
-                  border: '1px solid var(--accent-color)',
-                  borderRadius: '10px', padding: '10px 16px',
-                  fontSize: '0.9rem', fontFamily: 'Outfit, sans-serif',
-                  cursor: 'pointer', outline: 'none',
-                }}
-              >
-                {players.map((p, i) => (
-                  <option key={i} value={i} style={{ background: '#0d1117', padding: '8px', lineHeight: '2' }}>
-                    {p.name} — {p.team}
-                  </option>
-                ))}
-              </select>
-
-              {/* Player card */}
-              <div style={{ textAlign: 'center', marginBottom: '16px' }}>
-                <h3 style={{ color: 'var(--accent-color)', fontFamily: 'Orbitron', fontSize: '1rem', marginBottom: '2px' }}>{players[selectedPlayer].name}</h3>
-                <p style={{ color: 'var(--text-dim)', fontSize: '0.75rem', letterSpacing: '1px' }}>{players[selectedPlayer].team}</p>
-              </div>
-              <RadarChart stats={Object.values(players[selectedPlayer].stats)} name={players[selectedPlayer].name} color="#00ff88" />
-
-              {/* Individual stat bars */}
-              <div style={{ marginTop: '20px' }}>
-                {Object.entries(players[selectedPlayer].stats).map(([key, val], i) => (
-                  <div key={key} style={{ marginBottom: '12px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', marginBottom: '5px' }}>
-                      <span style={{ color: 'var(--text-dim)', textTransform: 'capitalize' }}>{key}</span>
-                      <span style={{ color: 'var(--accent-color)', fontWeight: 700 }}>{val}</span>
-                    </div>
-                    <div style={{ height: '5px', background: 'rgba(255,255,255,0.07)', borderRadius: '3px', overflow: 'hidden' }}>
-                      <motion.div
-                        initial={{ width: 0 }}
-                        animate={{ width: `${val}%` }}
-                        transition={{ duration: 0.8, ease: 'easeOut', delay: i * 0.08 }}
-                        style={{ height: '100%', background: `linear-gradient(90deg, #00ff8866, #00ff88)`, borderRadius: '3px' }}
-                      />
-                    </div>
+                {/* AI Prediction Insights (VIP golden panel) */}
+                <div style={{ 
+                  marginTop: '25px', 
+                  padding: '18px', 
+                  background: 'linear-gradient(135deg, rgba(255,215,0,0.05), rgba(255,255,255,0.01))', 
+                  borderRadius: '12px', 
+                  border: '1px solid rgba(255,215,0,0.25)', 
+                  boxShadow: '0 4px 20px rgba(255,215,0,0.05)'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+                    <span style={{ fontSize: '1.1rem' }}>🏆</span>
+                    <span style={{ fontSize: '0.72rem', color: 'var(--accent-secondary)', fontFamily: 'Orbitron', fontWeight: 'bold', letterSpacing: '1px' }}>AI PREDICTION INSIGHT (VIP)</span>
                   </div>
-                ))}
-              </div>
-              <div style={{ marginTop: '16px', padding: '12px 16px', background: 'rgba(0,255,136,0.05)', borderRadius: '10px', border: '1px solid rgba(0,255,136,0.15)', fontSize: '0.82rem', color: 'var(--text-dim)', lineHeight: 1.6 }}>
-                💡 {players[selectedPlayer].bio}
-              </div>
-            </motion.div>
-          )}
-        </section>
-
-        {/* Recent Performance Section */}
-        <section className="glass-panel">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
-            <Activity color="var(--accent-color)" />
-            <h2 className="heading-font">Racha Equipos</h2>
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-            {['Boca Juniors', 'River Plate', 'Racing Club', 'Independiente'].map(team => (
-              <div key={team} className="streak-item">
-                <span>{team}</span>
-                <div className="dots">
-                  <span className="dot win">W</span>
-                  <span className="dot win">W</span>
-                  <span className="dot draw">D</span>
-                  <span className="dot win">W</span>
-                  <span className="dot loss">L</span>
+                  <p style={{ color: '#fff', fontSize: '0.82rem', lineHeight: 1.6, margin: 0, opacity: 0.9 }}>
+                    {currentPlayer.bio}
+                  </p>
+                  <div style={{ 
+                    marginTop: '14px', 
+                    display: 'flex', 
+                    justifyContent: 'space-between', 
+                    alignItems: 'center', 
+                    background: 'rgba(0,255,136,0.04)', 
+                    padding: '8px 12px', 
+                    borderRadius: '8px', 
+                    border: '1px solid rgba(0,255,136,0.1)',
+                    display: 'flex',
+                    justifyContent: 'space-between'
+                  }}>
+                    <span style={{ fontSize: '0.7rem', color: 'var(--text-dim)' }}>Tip Recomendado:</span>
+                    <span style={{ fontSize: '0.75rem', color: 'var(--accent-color)', fontWeight: 'bold', fontFamily: 'Orbitron', letterSpacing: '0.5px' }}>MÁS DE 1.5 TIROS</span>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        </section>
-        {/* Effectiveness Gauge */}
-        <EffectivenessGauge league={league} />
+              </section>
+
+              {/* Bottom Row: Matchday Leaders Leaderboard */}
+              <section className="glass-panel" style={{ gridColumn: '1 / -1', marginTop: '20px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
+                  <Trophy color="var(--accent-secondary)" />
+                  <h2 className="heading-font" style={{ fontSize: '1.1rem', letterSpacing: '0.5px' }}>Líderes de Rendimiento de la Fecha</h2>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '15px' }}>
+                  {players.slice(0, 4).map((p, idx) => {
+                    const maxStat = Math.max(...Object.values(p.stats));
+                    const isSelected = currentPlayer.name === p.name;
+                    return (
+                      <motion.div 
+                        key={p.name}
+                        whileHover={{ scale: 1.03 }}
+                        onClick={() => {
+                          const originalIdx = players.findIndex(pl => pl.name === p.name);
+                          if (originalIdx !== -1) setSelectedPlayer(originalIdx);
+                        }}
+                        style={{ 
+                          background: isSelected ? 'rgba(0,255,136,0.03)' : 'rgba(255,255,255,0.02)', 
+                          border: `1px solid ${isSelected ? 'var(--accent-color)' : 'rgba(255,255,255,0.05)'}`, 
+                          borderRadius: '12px', 
+                          padding: '20px 16px', 
+                          textAlign: 'center',
+                          position: 'relative',
+                          overflow: 'hidden',
+                          cursor: 'pointer',
+                          boxShadow: isSelected ? '0 4px 15px rgba(0,255,136,0.05)' : 'none',
+                          transition: 'all 0.2s'
+                        }}
+                      >
+                        {/* Top position badge */}
+                        <div style={{ 
+                          position: 'absolute', top: '10px', left: '10px', 
+                          width: '24px', height: '24px', borderRadius: '50%',
+                          background: idx === 0 ? 'var(--accent-secondary)' : (idx === 1 ? '#c0c0c0' : (idx === 2 ? '#cd7f32' : 'rgba(255,255,255,0.1)')),
+                          color: '#000', fontWeight: 'bold', fontSize: '0.8rem',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center'
+                        }}>
+                          #{idx + 1}
+                        </div>
+                        
+                        <div style={{ fontSize: '1.8rem', margin: '10px 0 5px' }}>👤</div>
+                        <h3 style={{ fontSize: '0.85rem', color: '#fff', fontFamily: 'Orbitron', marginBottom: '3px' }}>{p.name}</h3>
+                        <p style={{ fontSize: '0.68rem', color: 'var(--text-dim)' }}>{p.team}</p>
+                        
+                        <div style={{ marginTop: '12px', display: 'inline-flex', alignItems: 'center', gap: '5px', background: 'rgba(0,255,136,0.08)', borderRadius: '20px', padding: '4px 12px', fontSize: '0.72rem', color: 'var(--accent-color)', fontWeight: 'bold', fontFamily: 'Orbitron' }}>
+                          <span>Rating: {maxStat}%</span>
+                        </div>
+                      </motion.div>
+                    );
+                  })}
+                </div>
+              </section>
+            </>
+          );
+        })()}
       </main>
+
       <FloatingBot t={t} />
       <AnalysisModal 
         isOpen={isModalOpen} 

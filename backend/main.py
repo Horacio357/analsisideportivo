@@ -1,7 +1,10 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Optional
+from sqlalchemy.orm import Session
+from database import get_db, engine, Base
+import models
 import uvicorn
 import os
 import mercadopago
@@ -40,21 +43,172 @@ class PredictionResponse(BaseModel):
 async def root():
     return {"message": "Football Betting AI API is running"}
 
-@app.get("/matches")
-async def get_matches(league_id: int = 128, season: int = 2024):
-    # This will be replaced by the ingestion service
-    return {"status": "success", "league": league_id, "matches": []}
+def generate_betting_details(m):
+    hp, dp, ap = m.home_prob, m.draw_prob, m.away_prob
+    
+    # Check if custom fields are seeded in database
+    if m.confidence is not None:
+        return {
+            "group_name": m.group_name or "",
+            "confidence": m.confidence,
+            "seguro_dnb_team": m.seguro_dnb_team or "",
+            "seguro_dnb_odds": m.seguro_dnb_odds or "1.00",
+            "seguro_handicap_market": m.seguro_handicap_market or "",
+            "seguro_handicap_odds": m.seguro_handicap_odds or "1.00",
+            "valor_1x2_team": m.valor_1x2_team or "",
+            "valor_1x2_odds": m.valor_1x2_odds or "1.00",
+            "valor_overunder_market": m.valor_overunder_market or "",
+            "valor_overunder_odds": m.valor_overunder_odds or "1.00",
+            "arriesgado_1x2pt_market": m.arriesgado_1x2pt_market or "",
+            "arriesgado_1x2pt_odds": m.arriesgado_1x2pt_odds or "1.00",
+            "arriesgado_btts_market": m.arriesgado_btts_market or "",
+            "arriesgado_btts_odds": m.arriesgado_btts_odds or "1.00",
+            "when_to_bet": m.when_to_bet or "Pre-partido (24-48h antes)",
+            "pending_adjustments": m.pending_adjustments or "Sin lesionados reportados; alineación confirmada.",
+            "metric_form_xg": m.metric_form_xg or 60,
+            "metric_squad": m.metric_squad or 25,
+            "metric_context": m.metric_context or 10,
+            "metric_h2h": m.metric_h2h or 5
+        }
 
-@app.get("/predict/{match_id}")
-async def predict_match(match_id: int):
-    # Placeholder for prediction logic
+    # Otherwise, dynamic generation based on math Heuristics
+    fav_team = m.home_team.name if hp >= ap else m.away_team.name
+    underdog_team = m.away_team.name if hp >= ap else m.home_team.name
+    fav_prob = max(hp, ap)
+    underdog_prob = min(hp, ap)
+    
+    # Confidence Level
+    if abs(hp - ap) >= 30:
+        confidence = "ALTA"
+    elif abs(hp - ap) >= 15:
+        confidence = "MEDIA"
+    else:
+        confidence = "VALUE BET"
+        
+    # Odds calculations (house margin applied)
+    margin = 0.92
+    home_odds = round(max(1.02, 100.0 / max(1, hp) * margin), 2)
+    draw_odds = round(max(1.02, 100.0 / max(1, dp) * margin), 2)
+    away_odds = round(max(1.02, 100.0 / max(1, ap) * margin), 2)
+    
+    fav_odds = home_odds if hp >= ap else away_odds
+    
+    # 1. SEGURO
+    # Sin Empate (DNB)
+    dnb_prob = fav_prob / (fav_prob + underdog_prob) if (fav_prob + underdog_prob) > 0 else 0.5
+    dnb_odds = round(max(1.02, 1.0 / max(0.01, dnb_prob) * margin), 2)
+    seguro_dnb_team = fav_team
+    seguro_dnb_odds = f"{dnb_odds:.2f}"
+    
+    # Handicap
+    if confidence == "ALTA":
+        seguro_handicap_market = f"Hándicap Asiático -1.5 ({fav_team})"
+        seguro_handicap_odds = f"{round(fav_odds + 0.40, 2):.2f}"
+    else:
+        seguro_handicap_market = f"Hándicap Asiático -0.5 ({fav_team})"
+        seguro_handicap_odds = f"{fav_odds:.2f}"
+        
+    # 2. VALOR
+    # 1X2 Gana (Ensure never using victoria favorito, strictly 1X2 — [nombre equipo] gana)
+    valor_1x2_team = f"1X2 — {fav_team} gana"
+    valor_1x2_odds = f"{fav_odds:.2f}"
+    
+    # Over/Under 2.5
+    if (hp + ap) > 65:
+        valor_overunder_market = "Over/Under: Más de 2.5 goles"
+        valor_overunder_odds = f"{round(1.75 + (dp / 100.0), 2):.2f}"
+    else:
+        valor_overunder_market = "Over/Under: Menos de 2.5 goles"
+        valor_overunder_odds = f"{round(1.65 + (fav_prob / 200.0), 2):.2f}"
+        
+    # 3. ARRIESGADO
+    # 1X2 Primer Tiempo
+    if confidence == "ALTA":
+        arriesgado_1x2pt_market = f"1X2 Primer Tiempo ({fav_team} gana)"
+        arriesgado_1x2pt_odds = f"{round(fav_odds + 0.50, 2):.2f}"
+    else:
+        arriesgado_1x2pt_market = "1X2 Primer Tiempo (Empate)"
+        arriesgado_1x2pt_odds = f"{round(draw_odds - 0.30, 2):.2f}"
+        
+    # BTTS
+    if confidence == "ALTA":
+        arriesgado_btts_market = "BTTS (Ambos Anotan): No"
+        arriesgado_btts_odds = f"{round(1.60 + (dp / 100.0), 2):.2f}"
+    else:
+        arriesgado_btts_market = "BTTS (Ambos Anotan): Sí"
+        arriesgado_btts_odds = f"{round(1.80 + (fav_prob / 200.0), 2):.2f}"
+        
+    # When to bet
+    when_to_bet = "Pre-partido (24-48h antes)" if confidence == "ALTA" else "En Vivo (In-Play)"
+    pending_adjustments = "Confirmar alineaciones iniciales y estados físicos de último minuto."
+    
+    # Methodology Metrics (60/25/10/5)
+    metric_form_xg = int(max(40, min(95, 60 + (hp - ap) * 0.4)))
+    metric_squad = int(max(45, min(95, 75 + (hp - ap) * 0.3)))
+    metric_context = int(max(50, min(95, 70 + (hp - ap) * 0.2)))
+    metric_h2h = int(max(50, min(95, 65 + (hp - ap) * 0.1)))
+
     return {
-        "match_id": match_id,
-        "home_win_prob": 0.45,
-        "draw_prob": 0.30,
-        "away_win_prob": 0.25,
-        "prediction": "Home Win",
-        "analysis": "Cavani has scored in 3 of the last 4 matches. Home team has a 70% win rate at home."
+        "group_name": "Fase de Grupos" if m.league_id == "WC" else "Liga Regular",
+        "confidence": confidence,
+        "seguro_dnb_team": seguro_dnb_team,
+        "seguro_dnb_odds": seguro_dnb_odds,
+        "seguro_handicap_market": seguro_handicap_market,
+        "seguro_handicap_odds": seguro_handicap_odds,
+        "valor_1x2_team": valor_1x2_team,
+        "valor_1x2_odds": valor_1x2_odds,
+        "valor_overunder_market": valor_overunder_market,
+        "valor_overunder_odds": valor_overunder_odds,
+        "arriesgado_1x2pt_market": arriesgado_1x2pt_market,
+        "arriesgado_1x2pt_odds": arriesgado_1x2pt_odds,
+        "arriesgado_btts_market": arriesgado_btts_market,
+        "arriesgado_btts_odds": arriesgado_btts_odds,
+        "when_to_bet": when_to_bet,
+        "pending_adjustments": pending_adjustments,
+        "metric_form_xg": metric_form_xg,
+        "metric_squad": metric_squad,
+        "metric_context": metric_context,
+        "metric_h2h": metric_h2h
+    }
+
+@app.get("/matches")
+async def get_matches(league_id: str, db: Session = Depends(get_db)):
+    matches = db.query(models.Match).filter(models.Match.league_id == league_id).all()
+    result = []
+    for m in matches:
+        bet_data = generate_betting_details(m)
+        result.append({
+            "id": m.id,
+            "home": m.home_team.name,
+            "homeLogo": m.home_team.logo,
+            "away": m.away_team.name,
+            "awayLogo": m.away_team.logo,
+            "homeProb": m.home_prob,
+            "drawProb": m.draw_prob,
+            "awayProb": m.away_prob,
+            "prediction": m.prediction,
+            **bet_data
+        })
+    return {"status": "success", "league": league_id, "matches": result}
+
+@app.get("/team/{league_id}")
+async def get_team(league_id: str, db: Session = Depends(get_db)):
+    team = db.query(models.Team).filter(models.Team.league_id == league_id).first()
+    if not team:
+        raise HTTPException(status_code=404, detail="Team not found")
+    
+    stats_list = [int(x) for x in team.stats.split(',')] if team.stats else [50, 50, 50, 50, 50, 50]
+    
+    return {
+        "name": team.name,
+        "logo": team.logo,
+        "stats": stats_list,
+        "color": team.color,
+        "form": team.form,
+        "goals": team.goals,
+        "conceded": team.conceded,
+        "possession": team.possession,
+        "wins": team.wins
     }
 
 @app.get("/players/{player_id}")
