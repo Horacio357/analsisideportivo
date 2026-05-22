@@ -239,9 +239,9 @@ async def create_preference(item: dict):
             }
         ],
         "back_urls": {
-            "success": "http://localhost:5173/?status=success",
-            "failure": "http://localhost:5173/?status=failure",
-            "pending": "http://localhost:5173/?status=pending"
+            "success": f"{os.getenv('FRONTEND_URL', 'http://localhost:5173')}/?status=success",
+            "failure": f"{os.getenv('FRONTEND_URL', 'http://localhost:5173')}/?status=failure",
+            "pending": f"{os.getenv('FRONTEND_URL', 'http://localhost:5173')}/?status=pending"
         },
         "auto_return": "approved",
         "statement_descriptor": "BET AI VIP",

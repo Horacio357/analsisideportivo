@@ -27,7 +27,8 @@ const SubscriptionModal = ({ isOpen, onClose, t, onVipActivated }) => {
     setStep('loading');
 
     try {
-      const response = await axios.post('http://localhost:8000/create_preference', {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+      const response = await axios.post(`${apiUrl}/create_preference`, {
         title: 'Suscripción BET AI VIP',
         quantity: 1,
         unit_price: 9.99,
