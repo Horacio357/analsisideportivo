@@ -186,7 +186,15 @@ const App = () => {
   }
 
   return (
-    <div className="min-h-screen" style={{ width: '100%', overflowX: 'hidden' }}>
+    <motion.div 
+      initial="hidden"
+      animate="visible"
+      variants={{ visible: { transition: { staggerChildren: 0.15, delayChildren: 0.1 } } }}
+      className="min-h-screen" style={{ width: '100%', overflowX: 'hidden' }}
+    >
+      {/* Background Grid */}
+      <div className="bg-grid"></div>
+
       {loading && (
         <motion.div 
           initial={{ opacity: 1 }}
@@ -199,7 +207,10 @@ const App = () => {
       )}
 
       {/* Header */}
-      <header className="glass-panel" style={{ margin: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '15px' }}>
+      <motion.header 
+        variants={{ hidden: { y: -50, opacity: 0 }, visible: { y: 0, opacity: 1, transition: { type: 'spring', stiffness: 100 } } }}
+        className="glass-panel" style={{ margin: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '15px' }}
+      >
         <h1 className="heading-font" style={{ color: 'var(--accent-color)', fontSize: '1.5rem' }}>
           BET AI <span style={{ color: 'var(--text-main)' }}>PREDICTOR</span>
         </h1>
@@ -243,10 +254,13 @@ const App = () => {
             )}
           </nav>
         </div>
-      </header>
+      </motion.header>
 
       {/* League Selector */}
-      <div className="league-selector-wrapper" style={{ padding: '0 20px', marginBottom: '20px' }}>
+      <motion.div 
+        variants={{ hidden: { opacity: 0, scale: 0.9 }, visible: { opacity: 1, scale: 1, transition: { type: 'spring' } } }}
+        className="league-selector-wrapper" style={{ padding: '0 20px', marginBottom: '20px' }}
+      >
         <div className="league-selector-container" style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
           <span style={{ fontSize: '0.7rem', color: 'var(--text-dim)', letterSpacing: '1.5px', fontFamily: 'Orbitron', flexShrink: 0 }}>LIGA</span>
           <div style={{ position: 'relative', flex: '0 0 auto' }}>
@@ -305,9 +319,12 @@ const App = () => {
             EN VIVO
           </motion.div>
         </div>
-      </div>
+      </motion.div>
 
-      <main className="dashboard-grid">
+      <motion.main 
+        variants={{ hidden: { opacity: 0 }, visible: { opacity: 1 } }}
+        className="dashboard-grid"
+      >
         {activeTab === 'predictions' ? (
           <>
             {/* Prediction Cards */}
@@ -316,65 +333,73 @@ const App = () => {
                 <BrainCircuit color="var(--accent-color)" />
                 <h2 className="heading-font">IA Predictions</h2>
               </div>
-              {matches.map(match => (
-                <motion.div 
-                  key={match.id}
-                  initial={{ x: -20, opacity: 0 }}
-                  animate={{ x: 0, opacity: 1 }}
-                  className="match-card"
-                  style={{ marginBottom: '15px', padding: '15px', borderLeft: '4px solid var(--accent-color)', background: 'rgba(255,255,255,0.05)' }}
-                >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '14px', gap: '8px', alignItems: 'center' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', maxWidth: '42%' }}>
-                      {getTeamLogoPath(match.home) && (
-                        <img 
-                          src={getTeamLogoPath(match.home)} 
-                          alt={match.home} 
-                          style={{ width: '18px', height: '18px', objectFit: 'contain', flexShrink: 0 }} 
-                        />
-                      )}
-                      <span className="heading-font" style={{ fontSize: 'var(--team-font-size)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{match.home}</span>
-                    </div>
-                    
-                    <span style={{ color: 'var(--accent-secondary)', fontSize: '0.72rem', fontWeight: 'bold', fontFamily: 'Orbitron' }}>VS</span>
-                    
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', maxWidth: '42%', justifyContent: 'flex-end' }}>
-                      <span className="heading-font" style={{ fontSize: 'var(--team-font-size)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{match.away}</span>
-                      {getTeamLogoPath(match.away) && (
-                        <img 
-                          src={getTeamLogoPath(match.away)} 
-                          alt={match.away} 
-                          style={{ width: '18px', height: '18px', objectFit: 'contain', flexShrink: 0 }} 
-                        />
-                      )}
-                    </div>
-                  </div>
-                  <div style={{ display: 'flex', gap: '10px' }}>
-                    <div className="prob-bar">
-                      <div style={{ width: `${match.homeProb}%`, background: 'var(--accent-color)' }}></div>
-                      <span style={{ fontSize: 'var(--bar-text-size)' }}>L: {match.homeProb}%</span>
-                    </div>
-                    <div className="prob-bar">
-                      <div style={{ width: `${match.drawProb}%`, background: '#888' }}></div>
-                      <span style={{ fontSize: 'var(--bar-text-size)' }}>E: {match.drawProb}%</span>
-                    </div>
-                    <div className="prob-bar">
-                      <div style={{ width: `${match.awayProb}%`, background: '#ff4444' }}></div>
-                      <span style={{ fontSize: 'var(--bar-text-size)' }}>V: {match.awayProb}%</span>
-                    </div>
-                  </div>
-                  <button 
-                    className="pes-button" 
-                    style={{ width: '100%', marginTop: '10px', padding: '8px' }}
-                    onClick={() => {
-                      setSelectedMatch(match);
-                      setIsModalOpen(true);
-                    }}
+              <motion.div
+                initial="hidden"
+                animate="visible"
+                variants={{ visible: { transition: { staggerChildren: 0.1 } } }}
+              >
+                {matches.map((match) => (
+                  <motion.div 
+                    key={match.id}
+                    variants={{ hidden: { x: -30, opacity: 0 }, visible: { x: 0, opacity: 1 } }}
+                    whileHover={{ translateY: '-4px', boxShadow: '0 12px 40px rgba(0,0,0,0.4)', borderLeftColor: 'var(--accent-secondary)' }}
+                    className="match-card"
+                    style={{ marginBottom: '15px', padding: '15px', borderLeft: '4px solid var(--accent-color)', background: 'rgba(255,255,255,0.05)', borderRadius: '12px' }}
                   >
-                    {t.analyzePro}
-                  </button>
-                </motion.div>
-              ))}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '14px', gap: '8px', alignItems: 'center' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', maxWidth: '42%' }}>
+                        {getTeamLogoPath(match.home) && (
+                          <img 
+                            src={getTeamLogoPath(match.home)} 
+                            alt={match.home} 
+                            style={{ width: '18px', height: '18px', objectFit: 'contain', flexShrink: 0 }} 
+                          />
+                        )}
+                        <span className="heading-font" style={{ fontSize: 'var(--team-font-size)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{match.home}</span>
+                      </div>
+                      
+                      <span style={{ color: 'var(--accent-secondary)', fontSize: '0.72rem', fontWeight: 'bold', fontFamily: 'Orbitron', textShadow: '0 0 10px var(--accent-secondary)' }}>VS</span>
+                      
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', maxWidth: '42%', justifyContent: 'flex-end' }}>
+                        <span className="heading-font" style={{ fontSize: 'var(--team-font-size)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{match.away}</span>
+                        {getTeamLogoPath(match.away) && (
+                          <img 
+                            src={getTeamLogoPath(match.away)} 
+                            alt={match.away} 
+                            style={{ width: '18px', height: '18px', objectFit: 'contain', flexShrink: 0 }} 
+                          />
+                        )}
+                      </div>
+                    </div>
+                    <div style={{ display: 'flex', gap: '10px' }}>
+                      <div className="prob-bar">
+                        <motion.div initial={{ width: 0 }} animate={{ width: `${match.homeProb}%` }} transition={{ duration: 1, ease: 'easeOut' }} style={{ background: 'var(--accent-color)', height: '100%' }}></motion.div>
+                        <span style={{ fontSize: 'var(--bar-text-size)' }}>L: {match.homeProb}%</span>
+                      </div>
+                      <div className="prob-bar">
+                        <motion.div initial={{ width: 0 }} animate={{ width: `${match.drawProb}%` }} transition={{ duration: 1, ease: 'easeOut' }} style={{ background: '#888', height: '100%' }}></motion.div>
+                        <span style={{ fontSize: 'var(--bar-text-size)' }}>E: {match.drawProb}%</span>
+                      </div>
+                      <div className="prob-bar">
+                        <motion.div initial={{ width: 0 }} animate={{ width: `${match.awayProb}%` }} transition={{ duration: 1, ease: 'easeOut' }} style={{ background: '#ff4444', height: '100%' }}></motion.div>
+                        <span style={{ fontSize: 'var(--bar-text-size)' }}>V: {match.awayProb}%</span>
+                      </div>
+                    </div>
+                    <motion.button 
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="pes-button" 
+                      style={{ width: '100%', marginTop: '10px', padding: '8px', fontSize: '0.8rem' }}
+                      onClick={() => {
+                        setSelectedMatch(match);
+                        setIsModalOpen(true);
+                      }}
+                    >
+                      {t.analyzePro}
+                    </motion.button>
+                  </motion.div>
+                ))}
+              </motion.div>
             </section>
 
             {/* ── Unified Analysis Panel ── */}
@@ -526,10 +551,22 @@ const App = () => {
                 <Activity color="var(--accent-color)" />
                 <h2 className="heading-font">Racha Equipos</h2>
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+              <motion.div 
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                variants={{ visible: { transition: { staggerChildren: 0.1 } } }}
+                style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}
+              >
                 {['Boca Juniors', 'River Plate', 'Racing Club', 'Independiente'].map(team => (
-                  <div key={team} className="streak-item">
-                    <span>{team}</span>
+                  <motion.div 
+                    key={team} 
+                    variants={{ hidden: { x: -20, opacity: 0 }, visible: { x: 0, opacity: 1 } }}
+                    whileHover={{ scale: 1.02, background: 'rgba(255,255,255,0.08)' }}
+                    className="streak-item"
+                    style={{ padding: '10px 15px', borderRadius: '8px', transition: 'background 0.3s' }}
+                  >
+                    <span style={{ fontWeight: 600 }}>{team}</span>
                     <div className="dots">
                       <span className="dot win">W</span>
                       <span className="dot win">W</span>
@@ -537,9 +574,9 @@ const App = () => {
                       <span className="dot win">W</span>
                       <span className="dot loss">L</span>
                     </div>
-                  </div>
+                  </motion.div>
                 ))}
-              </div>
+              </motion.div>
             </section>
             {/* Effectiveness Gauge */}
             <EffectivenessGauge league={league} />
@@ -897,7 +934,7 @@ const App = () => {
             </>
           );
         })()}
-      </main>
+      </motion.main>
 
       <FloatingBot t={t} />
       <AnalysisModal 
@@ -917,7 +954,7 @@ const App = () => {
           setIsVipModalOpen(false);
         }}
       />
-    </div>
+    </motion.div>
   );
 };
 

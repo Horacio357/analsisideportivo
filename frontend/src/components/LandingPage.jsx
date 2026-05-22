@@ -31,25 +31,47 @@ const LandingPage = ({ onEnter, t }) => {
       <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(circle, transparent 20%, #000 80%)', zIndex: 1 }}></div>
 
       <motion.div
-        initial={{ scale: 0.8, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: 1, ease: "easeOut" }}
-        style={{ textAlign: 'center', zIndex: 2 }}
+        initial="hidden"
+        animate="visible"
+        variants={{ visible: { transition: { staggerChildren: 0.2, delayChildren: 0.3 } } }}
+        style={{ textAlign: 'center', zIndex: 2, display: 'flex', flexDirection: 'column', alignItems: 'center' }}
       >
-        <Trophy size={80} color="var(--accent-color)" style={{ marginBottom: '20px', filter: 'drop-shadow(0 0 15px var(--accent-color))' }} />
-        <h1 className="landing-title" style={{ color: 'var(--accent-color)', marginBottom: '10px', textShadow: '0 0 30px rgba(0,255,136,0.6)' }}>
-          BET <span style={{ color: 'var(--text-main)' }}>AI</span>
-        </h1>
-        <p className="landing-subtitle" style={{ color: 'var(--text-main)', marginBottom: '40px', fontWeight: 'bold', textTransform: 'uppercase' }}>
-          PRO FOOTBALL ANALYTICS
-        </p>
+        <motion.div variants={{ hidden: { y: -100, opacity: 0 }, visible: { y: 0, opacity: 1, transition: { type: 'spring', stiffness: 100 } } }}>
+          <Trophy size={80} color="var(--accent-color)" style={{ marginBottom: '20px', filter: 'drop-shadow(0 0 20px var(--accent-color))' }} />
+        </motion.div>
         
-        <button 
-          className="pes-button landing-btn" 
-          onClick={onEnter}
+        <div style={{ display: 'flex', overflow: 'hidden', padding: '10px' }}>
+          <motion.h1 
+            variants={{ hidden: { x: -100, opacity: 0 }, visible: { x: 0, opacity: 1, transition: { type: 'spring', damping: 15 } } }}
+            className="landing-title" style={{ color: 'var(--accent-color)', marginRight: '20px', textShadow: '0 0 30px var(--accent-color)' }}
+          >
+            BET
+          </motion.h1>
+          <motion.h1 
+            variants={{ hidden: { x: 100, opacity: 0 }, visible: { x: 0, opacity: 1, transition: { type: 'spring', damping: 15 } } }}
+            className="landing-title" style={{ color: 'var(--text-main)', textShadow: '0 0 20px rgba(255,255,255,0.5)' }}
+          >
+            AI
+          </motion.h1>
+        </div>
+
+        <motion.p 
+          variants={{ hidden: { opacity: 0, scale: 0.8 }, visible: { opacity: 1, scale: 1 } }}
+          className="landing-subtitle" style={{ color: 'var(--text-main)', marginBottom: '40px', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '8px' }}
         >
-          {t.enter}
-        </button>
+          PRO FOOTBALL ANALYTICS
+        </motion.p>
+        
+        <motion.div variants={{ hidden: { y: 100, opacity: 0 }, visible: { y: 0, opacity: 1, transition: { type: 'spring', stiffness: 100 } } }}>
+          <motion.button 
+            whileHover={{ scale: 1.05, boxShadow: '0 0 30px var(--accent-color)' }}
+            whileTap={{ scale: 0.95 }}
+            className="pes-button landing-btn" 
+            onClick={onEnter}
+          >
+            {t.enter}
+          </motion.button>
+        </motion.div>
       </motion.div>
 
       {/* Decorative Glitch lines */}
