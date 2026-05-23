@@ -45,13 +45,13 @@ const LandingPage = ({ onEnter, t }) => {
             variants={{ hidden: { x: -100, opacity: 0 }, visible: { x: 0, opacity: 1, transition: { type: 'spring', damping: 15 } } }}
             className="landing-title" style={{ color: 'var(--accent-color)', marginRight: '20px', textShadow: '0 0 30px var(--accent-color)' }}
           >
-            BET
+            X
           </motion.h1>
           <motion.h1 
             variants={{ hidden: { x: 100, opacity: 0 }, visible: { x: 0, opacity: 1, transition: { type: 'spring', damping: 15 } } }}
             className="landing-title" style={{ color: 'var(--text-main)', textShadow: '0 0 20px rgba(255,255,255,0.5)' }}
           >
-            AI
+            Guru
           </motion.h1>
         </div>
 
@@ -59,7 +59,7 @@ const LandingPage = ({ onEnter, t }) => {
           variants={{ hidden: { opacity: 0, scale: 0.8 }, visible: { opacity: 1, scale: 1 } }}
           className="landing-subtitle" style={{ color: 'var(--text-main)', marginBottom: '40px', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '8px' }}
         >
-          PRO FOOTBALL ANALYTICS
+          TRUST THE XG
         </motion.p>
         
         <motion.div variants={{ hidden: { y: 100, opacity: 0 }, visible: { y: 0, opacity: 1, transition: { type: 'spring', stiffness: 100 } } }}>
