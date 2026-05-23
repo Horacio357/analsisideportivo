@@ -229,6 +229,11 @@ async def create_preference(item: dict):
             detail="Mercado Pago SDK not initialized. Please set MP_ACCESS_TOKEN in your .env file."
         )
 
+    # Ensure HTTPS for back_urls to avoid MP 400 error
+    frontend_url = os.getenv('FRONTEND_URL', 'https://localhost:5173')
+    if frontend_url.startswith('http://localhost'):
+        frontend_url = frontend_url.replace('http://', 'https://')
+
     preference_data = {
         "items": [
             {
@@ -238,10 +243,13 @@ async def create_preference(item: dict):
                 "currency_id": "ARS",
             }
         ],
+        "payer": {
+            "email": item.get("payer_email", "")
+        },
         "back_urls": {
-            "success": f"{os.getenv('FRONTEND_URL', 'http://localhost:5173')}/?status=success",
-            "failure": f"{os.getenv('FRONTEND_URL', 'http://localhost:5173')}/?status=failure",
-            "pending": f"{os.getenv('FRONTEND_URL', 'http://localhost:5173')}/?status=pending"
+            "success": f"{frontend_url}/?status=success",
+            "failure": f"{frontend_url}/?status=failure",
+            "pending": f"{frontend_url}/?status=pending"
         },
         "auto_return": "approved",
         "statement_descriptor": "BET AI VIP",
@@ -249,7 +257,8 @@ async def create_preference(item: dict):
 
     try:
         preference_response = sdk.preference().create(preference_data)
-        preference = preference_response["response"]
+        preference = preference_response.get("response", {})
+        print("MP Response:", preference_response)
 
         if "init_point" not in preference:
             raise HTTPException(status_code=400, detail=f"MP Error: {preference}")
@@ -259,6 +268,26 @@ async def create_preference(item: dict):
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error creating preference: {str(e)}")
+
+@app.post("/send_welcome_email")
+async def send_welcome_email(item: dict):
+    email = item.get("email")
+    plan_id = item.get("plan_id", "mensual")
+    
+    if not email:
+        raise HTTPException(status_code=400, detail="Email is required")
+        
+    print(f"\n{'='*40}")
+    print(f"📧 ENVIANDO EMAIL DE BIENVENIDA")
+    print(f"Para: {email}")
+    print(f"Plan adquirido: VIP {plan_id.upper()}")
+    print(f"Beneficios: Predicciones VIP, Top 3 MVP, Estadísticas Radar y más.")
+    print(f"¡Gracias por unirte a la élite de BET AI!")
+    print(f"{'='*40}\n")
+    
+    # Aquí iría el código real de smtplib o SendGrid cuando el usuario agregue credenciales
+    
+    return {"status": "success", "message": "Welcome email sent (simulated)"}
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

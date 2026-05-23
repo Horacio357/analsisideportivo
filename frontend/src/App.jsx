@@ -951,7 +951,6 @@ const App = () => {
         onVipActivated={(email) => {
           setIsVip(true);
           setVipEmail(email);
-          setIsVipModalOpen(false);
         }}
       />
     </motion.div>

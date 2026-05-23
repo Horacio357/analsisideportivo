@@ -11,10 +11,18 @@ const BENEFITS = [
   'Estadísticas radar de jugadores y equipos',
 ];
 
+const PLANS = [
+  { id: 'mensual', name: 'Mensual', price: 9.99, subtitle: 'Cancelá cuando quieras' },
+  { id: 'trimestral', name: 'Trimestral', price: 24.99, subtitle: 'Ahorras 15%' },
+  { id: 'semestral', name: 'Semestral', price: 44.99, subtitle: 'Ahorras 25%' },
+  { id: 'anual', name: 'Anual', price: 79.99, subtitle: 'Ahorras 33%' }
+];
+
 const SubscriptionModal = ({ isOpen, onClose, t, onVipActivated }) => {
   const [step, setStep] = useState('plan'); // 'plan' | 'loading' | 'success'
   const [email, setEmail] = useState('');
   const [emailError, setEmailError] = useState('');
+  const [selectedPlan, setSelectedPlan] = useState(PLANS[0]);
 
   const validateEmail = (val) => val && val.includes('@') && val.includes('.');
 
@@ -29,10 +37,11 @@ const SubscriptionModal = ({ isOpen, onClose, t, onVipActivated }) => {
     try {
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
       const response = await axios.post(`${apiUrl}/create_preference`, {
-        title: 'Suscripción BET AI VIP',
+        title: `Suscripción BET AI VIP - ${selectedPlan.name}`,
         quantity: 1,
-        unit_price: 9.99,
+        unit_price: selectedPlan.price,
         payer_email: email,
+        plan_id: selectedPlan.id
       });
 
       // Real MP token configured — redirect to checkout
@@ -88,16 +97,39 @@ const SubscriptionModal = ({ isOpen, onClose, t, onVipActivated }) => {
               <X size={20} />
             </button>
 
-            {/* Header */}
+            {/* Header / Planes */}
             <div style={{ textAlign: 'center', marginBottom: '20px' }}>
               <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'rgba(255,215,0,0.12)', border: '1px solid var(--accent-secondary)', borderRadius: '20px', padding: '5px 16px', marginBottom: '14px' }}>
                 <Crown size={13} color="var(--accent-secondary)" />
-                <span style={{ fontSize: '0.68rem', color: 'var(--accent-secondary)', letterSpacing: '2px', fontWeight: 700 }}>PLAN VIP MENSUAL</span>
+                <span style={{ fontSize: '0.68rem', color: 'var(--accent-secondary)', letterSpacing: '2px', fontWeight: 700 }}>PLAN VIP</span>
               </div>
-              <div style={{ fontSize: '2.8rem', fontWeight: 900, fontFamily: 'Orbitron, sans-serif', lineHeight: 1 }}>
-                $9.99
+              
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '15px' }}>
+                {PLANS.map(plan => (
+                  <div 
+                    key={plan.id}
+                    onClick={() => setSelectedPlan(plan)}
+                    style={{
+                      background: selectedPlan.id === plan.id ? 'rgba(0,255,136,0.1)' : 'rgba(255,255,255,0.03)',
+                      border: `1px solid ${selectedPlan.id === plan.id ? 'var(--accent-color)' : 'rgba(255,255,255,0.1)'}`,
+                      borderRadius: '8px',
+                      padding: '12px',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s',
+                    }}
+                  >
+                    <div style={{ fontSize: '0.8rem', color: selectedPlan.id === plan.id ? 'var(--accent-color)' : '#fff', fontWeight: 'bold' }}>
+                      {plan.name}
+                    </div>
+                    <div style={{ fontSize: '1.2rem', fontWeight: 900, fontFamily: 'Orbitron, sans-serif' }}>
+                      ${plan.price}
+                    </div>
+                    <div style={{ fontSize: '0.65rem', color: 'var(--text-dim)', marginTop: '4px' }}>
+                      {plan.subtitle}
+                    </div>
+                  </div>
+                ))}
               </div>
-              <span style={{ fontSize: '0.85rem', color: 'var(--text-dim)' }}>/ mes · Cancelá cuando quieras</span>
             </div>
 
             {/* Benefits */}
