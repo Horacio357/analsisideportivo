@@ -416,7 +416,10 @@ const App = () => {
                 </div>
                 {/* Mode toggle pills */}
                 <div style={{ display: 'flex', background: 'rgba(255,255,255,0.05)', borderRadius: '10px', padding: '4px', gap: '4px', margin: '0 auto' }}>
-                  {[{ id: 'team', label: '🏟️ Equipo' }, { id: 'player', label: '👤 Jugador' }].map(m => (
+                  {[
+                    { id: 'team', icon: '/icons/equipo.png', label: 'Equipo' }, 
+                    { id: 'player', icon: '/icons/jugador.png', label: 'Jugador' }
+                  ].map(m => (
                     <button
                       key={m.id}
                       onClick={() => setAnalysisMode(m.id)}
@@ -436,6 +439,16 @@ const App = () => {
                         fontWeight: analysisMode === m.id ? 700 : 400,
                       }}
                     >
+                      {/* Icon with brightness filter to match active state */}
+                      <img 
+                        src={m.icon} 
+                        alt={m.label} 
+                        style={{ 
+                          width: '16px', height: '16px', 
+                          filter: analysisMode === m.id ? 'brightness(0)' : 'brightness(0) invert(1) opacity(0.6)',
+                          transition: 'all 0.2s'
+                        }} 
+                      />
                       {m.label}
                     </button>
                   ))}
@@ -800,8 +813,8 @@ const App = () => {
                   </div>
 
                   {/* Player header */}
-                  <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-                    <div style={{ fontSize: '2.5rem', marginBottom: '8px' }}>👤</div>
+                  <div style={{ textAlign: 'center', marginBottom: '16px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    <img src="/icons/jugador.png" alt="Jugador" style={{ width: '48px', height: '48px', marginBottom: '8px', filter: 'drop-shadow(0 0 10px var(--accent-color))' }} />
                     <h3 style={{ color: 'var(--accent-color)', fontFamily: 'Orbitron', fontSize: '1.2rem', marginBottom: '4px' }}>{currentPlayer.name}</h3>
                     <p style={{ color: 'var(--text-dim)', fontSize: '0.78rem', letterSpacing: '1px' }}>{currentPlayer.team}</p>
                   </div>
@@ -849,7 +862,7 @@ const App = () => {
                   boxShadow: '0 4px 20px rgba(255,215,0,0.05)'
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-                    <span style={{ fontSize: '1.1rem' }}>🏆</span>
+                    <img src="/icons/copa-mundial.png" alt="VIP" style={{ width: '20px', height: '20px', filter: 'drop-shadow(0 0 5px rgba(255,215,0,0.5))' }} />
                     <span style={{ fontSize: '0.72rem', color: 'var(--accent-secondary)', fontFamily: 'Orbitron', fontWeight: 'bold', letterSpacing: '1px' }}>AI PREDICTION INSIGHT (VIP)</span>
                   </div>
                   <p style={{ color: '#fff', fontSize: '0.82rem', lineHeight: 1.6, margin: 0, opacity: 0.9 }}>
@@ -922,7 +935,11 @@ const App = () => {
                             style={{ width: '36px', height: '36px', objectFit: 'contain', margin: '10px auto 8px', display: 'block', flexShrink: 0 }} 
                           />
                         ) : (
-                          <div style={{ fontSize: '1.8rem', margin: '10px 0 5px' }}>👤</div>
+                          <img 
+                            src="/icons/goleador.png" 
+                            alt="Goleador" 
+                            style={{ width: '36px', height: '36px', objectFit: 'contain', margin: '10px auto 8px', display: 'block', flexShrink: 0, filter: 'drop-shadow(0 0 5px rgba(255,255,255,0.2))' }} 
+                          />
                         )}
                         <h3 style={{ fontSize: '0.85rem', color: '#fff', fontFamily: 'Orbitron', marginBottom: '3px' }}>{p.name}</h3>
                         <p style={{ fontSize: '0.68rem', color: 'var(--text-dim)' }}>{p.team}</p>

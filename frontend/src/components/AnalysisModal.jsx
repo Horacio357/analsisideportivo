@@ -270,7 +270,7 @@ const AnalysisModal = ({ isOpen, onClose, match, t, onOpenGlossary, getTeamLogoP
               {/* Lesiones */}
               <div>
                 <span style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.65rem', color: 'var(--text-dim)', marginBottom: '4px' }}>
-                  <Stethoscope size={12} color="#ff4444" /> REPORTE MÉDICO
+                  <img src="/icons/portero.png" alt="Reporte Médico" style={{ width: '14px', height: '14px', filter: 'drop-shadow(0 0 2px #ff4444)' }} /> REPORTE MÉDICO
                 </span>
                 <p style={{ margin: 0, fontSize: '0.82rem', color: '#fff' }}>
                   L: {advMetrics.injuries_home}<br/>
@@ -339,7 +339,7 @@ const AnalysisModal = ({ isOpen, onClose, match, t, onOpenGlossary, getTeamLogoP
         {/* ── SECTION 3: DECISION METHODOLOGY BREAKDOWN (60/25/10/5%) ── */}
         <div style={{ background: 'rgba(255,255,255,0.01)', border: '1px solid rgba(255,255,255,0.04)', borderRadius: '12px', padding: '18px', marginBottom: '24px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px' }}>
-            <Activity size={18} color="var(--accent-color)" />
+            <img src="/icons/tactica.png" alt="Táctica" style={{ width: '20px', height: '20px', filter: 'drop-shadow(0 0 5px var(--accent-color))' }} />
             <span style={{ fontSize: '0.7rem', color: 'var(--accent-color)', fontFamily: 'Orbitron', letterSpacing: '2px', fontWeight: 'bold' }}>
               DESGLOSE METODOLÓGICO DE DECISIÓN
             </span>
@@ -371,7 +371,10 @@ const AnalysisModal = ({ isOpen, onClose, match, t, onOpenGlossary, getTeamLogoP
             {/* Metric 3: Contexto de partido (10%) */}
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem', marginBottom: '4px' }}>
-                <span style={{ color: 'var(--text-main)', fontWeight: 500 }}>🏟️ Contexto de partido / Localía <span style={{ color: 'var(--accent-secondary)', fontFamily: 'Orbitron' }}>(10%)</span></span>
+                <span style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-main)', fontWeight: 500 }}>
+                  <img src="/icons/campo.png" alt="Campo" style={{ width: '14px', height: '14px', filter: 'brightness(0) invert(1) opacity(0.8)' }} /> 
+                  Contexto de partido / Localía <span style={{ color: 'var(--accent-secondary)', fontFamily: 'Orbitron' }}>(10%)</span>
+                </span>
                 <span style={{ color: 'var(--accent-secondary)', fontWeight: 'bold', fontFamily: 'Orbitron' }}>{match.metric_context}%</span>
               </div>
               <div style={{ height: '5px', background: 'rgba(255,255,255,0.05)', borderRadius: '3px', overflow: 'hidden' }}>
