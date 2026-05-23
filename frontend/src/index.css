@@ -492,3 +492,12 @@ nav button:hover {
     width: 92vw !important;
   }
 }
+
+/* Fix Mobile Overflow */
+.dashboard-grid > * { min-width: 0; max-width: 100%; }
+.glass-panel { max-width: 100%; box-sizing: border-box; overflow: hidden; }
+@media (max-width: 600px) {
+  .dashboard-grid { padding: 10px !important; }
+  .glass-panel { padding: 15px 10px !important; }
+  .recharts-responsive-container { min-width: 0 !important; width: 100% !important; }
+}

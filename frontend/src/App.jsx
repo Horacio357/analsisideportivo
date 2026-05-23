@@ -211,10 +211,14 @@ const App = () => {
         variants={{ hidden: { y: -50, opacity: 0 }, visible: { y: 0, opacity: 1, transition: { type: 'spring', stiffness: 100 } } }}
         className="glass-panel" style={{ margin: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '15px' }}
       >
-        <h1 className="heading-font" style={{ color: 'var(--accent-color)', fontSize: '1.5rem' }}>
-          BET AI <span style={{ color: 'var(--text-main)' }}>PREDICTOR</span>
-        </h1>
-        
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <h1 className="heading-font" style={{ color: 'var(--accent-color)', fontSize: '1.5rem', margin: 0, lineHeight: 1.2 }}>
+            XGuru
+          </h1>
+          <span style={{ fontSize: '0.8rem', color: 'var(--text-dim)', letterSpacing: '1px', fontStyle: 'italic', fontFamily: 'Outfit' }}>
+            "Trust the xG"
+          </span>
+        </div>
         <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
           <select 
             value={lang} 
