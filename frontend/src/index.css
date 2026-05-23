@@ -484,3 +484,11 @@ nav button:hover {
   font-family: 'Orbitron', sans-serif;
   text-align: center;
 }
+
+@media (max-width: 600px) {
+  .bot-panel {
+    right: 50% !important;
+    transform: translateX(50%) !important;
+    width: 92vw !important;
+  }
+}

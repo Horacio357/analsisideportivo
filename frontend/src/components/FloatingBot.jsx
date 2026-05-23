@@ -46,18 +46,20 @@ const FloatingBot = ({ t }) => {
   };
 
   return (
-    <div style={{ position: 'fixed', bottom: '25px', right: '25px', zIndex: 2000 }}>
+    <>
       <AnimatePresence>
         {isOpen && (
           <motion.div
             initial={{ scale: 0, opacity: 0, y: 50 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0, opacity: 0, y: 50 }}
-            className="glass-panel"
+            className="glass-panel bot-panel"
             style={{ 
-              width: window.innerWidth < 600 ? '90vw' : '340px', 
-              marginBottom: '15px', 
-              position: 'relative', 
+              position: 'fixed',
+              bottom: '90px',
+              right: '25px',
+              width: '340px',
+              zIndex: 2000,
               border: '2px solid var(--accent-color)', 
               padding: '20px' 
             }}
@@ -113,11 +115,17 @@ const FloatingBot = ({ t }) => {
       </AnimatePresence>
 
       <motion.button
-        whileHover={{ scale: 1.05 }}
+        animate={!isOpen ? { scale: [1, 1.08, 1], boxShadow: ['0 4px 15px rgba(0, 255, 136, 0.3)', '0 4px 25px rgba(0, 255, 136, 0.6)', '0 4px 15px rgba(0, 255, 136, 0.3)'] } : { scale: 1 }}
+        transition={!isOpen ? { repeat: Infinity, duration: 1.5, ease: "easeInOut" } : {}}
+        whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.95 }}
         onClick={() => setIsOpen(!isOpen)}
         className="pes-button"
         style={{ 
+          position: 'fixed',
+          bottom: '25px',
+          right: '25px',
+          zIndex: 2000,
           width: '55px', 
           height: '55px', 
           borderRadius: '50%', 
@@ -125,14 +133,14 @@ const FloatingBot = ({ t }) => {
           display: 'flex', 
           alignItems: 'center', 
           justifyContent: 'center',
-          boxShadow: '0 4px 15px rgba(0, 255, 136, 0.3)', /* Reduced neon glow */
           background: 'var(--accent-color)',
-          color: '#000'
+          color: '#000',
+          padding: 0
         }}
       >
-        {isOpen ? <X size={24} /> : <MessageSquare size={24} />}
+        {isOpen ? <X size={24} /> : <Bot size={28} />}
       </motion.button>
-    </div>
+    </>
   );
 };
 
