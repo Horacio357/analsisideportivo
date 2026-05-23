@@ -97,8 +97,9 @@ const AnalysisModal = ({ isOpen, onClose, match, t, onOpenGlossary, getTeamLogoP
                   />
                 )}
               </div>
-              <span style={{ fontSize: '0.72rem', color: 'var(--text-dim)', letterSpacing: '1px', fontFamily: 'Orbitron' }}>
-                ⚽ {match.group_name || 'Liga Regular'}
+              <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.72rem', color: 'var(--text-dim)', letterSpacing: '1px', fontFamily: 'Orbitron' }}>
+                <img src="/icons/balon.png" alt="Balón" style={{ width: '12px', height: '12px', filter: 'brightness(0) invert(1) opacity(0.6)' }} /> 
+                {match.group_name || 'Liga Regular'}
               </span>
             </div>
           </div>
@@ -118,11 +119,14 @@ const AnalysisModal = ({ isOpen, onClose, match, t, onOpenGlossary, getTeamLogoP
         </div>
 
         {/* ── SECTION 1: PRO BETTING CARD (SEGURO, VALOR, ARRIESGADO) ── */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '24px' }}>
-          <span style={{ fontSize: '0.7rem', color: 'var(--accent-color)', fontFamily: 'Orbitron', letterSpacing: '2px', display: 'block', marginBottom: '4px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px' }}>
+          <img src="/icons/apuesta.png" alt="Apuestas Pro" style={{ width: '22px', height: '22px', filter: 'drop-shadow(0 0 5px #ff4444)' }} />
+          <span style={{ fontSize: '0.8rem', color: '#ff4444', fontFamily: 'Orbitron', letterSpacing: '2px', fontWeight: 'bold' }}>
             FICHA DE APUESTAS PRO
           </span>
+        </div>
 
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '24px' }}>
           {/* SEGURO PANEL */}
           <div style={{ background: 'rgba(0, 255, 136, 0.03)', border: '1px solid rgba(0, 255, 136, 0.15)', borderRadius: '10px', padding: '14px 18px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
@@ -259,7 +263,7 @@ const AnalysisModal = ({ isOpen, onClose, match, t, onOpenGlossary, getTeamLogoP
               {/* xG */}
               <div>
                 <span style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.65rem', color: 'var(--text-dim)', marginBottom: '4px' }}>
-                  <Activity size={12} color="var(--accent-secondary)" /> xG PROYECTADO
+                  <img src="/icons/balon.png" alt="xG" style={{ width: '14px', height: '14px', filter: 'drop-shadow(0 0 2px var(--accent-secondary))' }} /> xG PROYECTADO
                 </span>
                 <p style={{ margin: 0, fontSize: '0.82rem', color: '#fff' }}>
                   {match.home}: <strong style={{ color: 'var(--accent-secondary)' }}>{advMetrics.xG_home}</strong><br/>

@@ -334,7 +334,7 @@ const App = () => {
             {/* Prediction Cards */}
             <section className="glass-panel">
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
-                <BrainCircuit color="var(--accent-color)" />
+                <img src="/icons/analisis.png" alt="Análisis" style={{ width: '24px', height: '24px', filter: 'drop-shadow(0 0 8px var(--accent-color))' }} />
                 <h2 className="heading-font">IA Predictions</h2>
               </div>
               <motion.div

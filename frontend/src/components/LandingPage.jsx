@@ -37,7 +37,7 @@ const LandingPage = ({ onEnter, t }) => {
         style={{ textAlign: 'center', zIndex: 2, display: 'flex', flexDirection: 'column', alignItems: 'center' }}
       >
         <motion.div variants={{ hidden: { y: -100, opacity: 0 }, visible: { y: 0, opacity: 1, transition: { type: 'spring', stiffness: 100 } } }}>
-          <Trophy size={80} color="var(--accent-color)" style={{ marginBottom: '20px', filter: 'drop-shadow(0 0 20px var(--accent-color))' }} />
+          <img src="/icons/apuestas-online.png" alt="Apuestas" style={{ width: '120px', height: '120px', marginBottom: '10px', filter: 'drop-shadow(0 0 20px var(--accent-color)) hue-rotate(10deg)' }} />
         </motion.div>
         
         <div style={{ display: 'flex', overflow: 'hidden', padding: '10px' }}>
