@@ -943,6 +943,8 @@ const App = () => {
         match={selectedMatch}
         t={t}
         getTeamLogoPath={getTeamLogoPath}
+        isVip={isVip}
+        onOpenVipModal={() => setIsVipModalOpen(true)}
       />
       <SubscriptionModal 
         isOpen={isVipModalOpen} 

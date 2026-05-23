@@ -1,9 +1,21 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, BrainCircuit, ShieldAlert, Award, Calendar, HelpCircle, Activity } from 'lucide-react';
+import { X, BrainCircuit, ShieldAlert, Award, Calendar, HelpCircle, Activity, Lock, Unlock, Thermometer, Stethoscope, CloudRain, Flag } from 'lucide-react';
 
-const AnalysisModal = ({ isOpen, onClose, match, t, onOpenGlossary, getTeamLogoPath }) => {
+const AnalysisModal = ({ isOpen, onClose, match, t, onOpenGlossary, getTeamLogoPath, isVip, onOpenVipModal }) => {
   if (!isOpen || !match) return null;
+
+  // Determinisitic mock advanced metrics based on match id
+  const advMetrics = {
+    xG_home: (match.homeProb / 20 + 0.5).toFixed(2),
+    xG_away: (match.awayProb / 20 + 0.5).toFixed(2),
+    fatigue_home: (match.id % 4) * 20 + 10, // 10% to 70%
+    fatigue_away: ((match.id + 1) % 4) * 20 + 10,
+    injuries_home: match.id % 2 === 0 ? 'Ninguna grave' : 'Baja: Portero titular',
+    injuries_away: match.id % 3 === 0 ? 'Baja: Goleador principal' : 'Plantel completo',
+    weather: match.id % 2 === 0 ? 'Lluvia intensa (favorece Under)' : 'Despejado (condiciones óptimas)',
+    referee: match.id % 3 === 0 ? 'Árbitro muy estricto (Promedio: 5.5 amarillas)' : 'Árbitro permisivo (Promedio: 3.2 amarillas)'
+  };
 
   const isAlta = match.confidence === 'ALTA';
   const isMedia = match.confidence === 'MEDIA';
@@ -214,6 +226,113 @@ const AnalysisModal = ({ isOpen, onClose, match, t, onOpenGlossary, getTeamLogoP
             <p style={{ margin: 0, fontSize: '0.82rem', color: '#ffb3b3', fontWeight: 400, lineHeight: 1.4 }}>
               ⚠️ {cleanTerm(match.pending_adjustments) || 'Confirmar alineaciones finales 1 hora antes del pitazo inicial.'}
             </p>
+          </div>
+        </div>
+
+        {/* ── SECTION VIP: MÉTRICAS AVANZADAS ── */}
+        <div style={{ position: 'relative', marginBottom: '24px' }}>
+          <div style={{ 
+            display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px',
+            filter: !isVip ? 'blur(0px)' : 'none' // Title is always visible
+          }}>
+            {isVip ? <Unlock size={18} color="var(--accent-secondary)" /> : <Lock size={18} color="var(--text-dim)" />}
+            <span style={{ fontSize: '0.75rem', color: isVip ? 'var(--accent-secondary)' : 'var(--text-dim)', fontFamily: 'Orbitron', letterSpacing: '2px', fontWeight: 'bold' }}>
+              MÉTRICAS AVANZADAS (VIP ONLY)
+            </span>
+          </div>
+
+          <div style={{ 
+            background: 'rgba(255, 215, 0, 0.03)', 
+            border: '1px solid rgba(255, 215, 0, 0.15)', 
+            borderRadius: '12px', 
+            padding: '18px',
+            position: 'relative',
+            overflow: 'hidden'
+          }}>
+            <div style={{
+              display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px',
+              filter: !isVip ? 'blur(6px)' : 'none',
+              opacity: !isVip ? 0.6 : 1,
+              pointerEvents: !isVip ? 'none' : 'auto',
+              transition: 'all 0.3s'
+            }}>
+              {/* xG */}
+              <div>
+                <span style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.65rem', color: 'var(--text-dim)', marginBottom: '4px' }}>
+                  <Activity size={12} color="var(--accent-secondary)" /> xG PROYECTADO
+                </span>
+                <p style={{ margin: 0, fontSize: '0.82rem', color: '#fff' }}>
+                  {match.home}: <strong style={{ color: 'var(--accent-secondary)' }}>{advMetrics.xG_home}</strong><br/>
+                  {match.away}: <strong style={{ color: 'var(--accent-secondary)' }}>{advMetrics.xG_away}</strong>
+                </p>
+              </div>
+              
+              {/* Lesiones */}
+              <div>
+                <span style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.65rem', color: 'var(--text-dim)', marginBottom: '4px' }}>
+                  <Stethoscope size={12} color="#ff4444" /> REPORTE MÉDICO
+                </span>
+                <p style={{ margin: 0, fontSize: '0.82rem', color: '#fff' }}>
+                  L: {advMetrics.injuries_home}<br/>
+                  V: {advMetrics.injuries_away}
+                </p>
+              </div>
+
+              {/* Fatiga */}
+              <div>
+                <span style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.65rem', color: 'var(--text-dim)', marginBottom: '4px' }}>
+                  <Thermometer size={12} color="#00c6ff" /> ÍNDICE DE FATIGA
+                </span>
+                <p style={{ margin: 0, fontSize: '0.82rem', color: '#fff' }}>
+                  {match.home}: {advMetrics.fatigue_home}% (Desgaste)<br/>
+                  {match.away}: {advMetrics.fatigue_away}% (Desgaste)
+                </p>
+              </div>
+
+              {/* Clima & Árbitro */}
+              <div>
+                <span style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.65rem', color: 'var(--text-dim)', marginBottom: '4px' }}>
+                  <CloudRain size={12} color="#fff" /> ENTORNO / ÁRBITRO
+                </span>
+                <p style={{ margin: 0, fontSize: '0.82rem', color: '#fff' }}>
+                  {advMetrics.weather}<br/>
+                  {advMetrics.referee}
+                </p>
+              </div>
+            </div>
+
+            {/* VIP Lock Overlay */}
+            {!isVip && (
+              <div style={{
+                position: 'absolute',
+                inset: 0,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: 'rgba(0,0,0,0.4)',
+                zIndex: 10
+              }}>
+                <button 
+                  onClick={() => { onClose(); onOpenVipModal && onOpenVipModal(); }}
+                  className="pes-button"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    padding: '10px 20px',
+                    fontSize: '0.75rem',
+                    background: 'var(--accent-secondary)',
+                    color: '#000',
+                    boxShadow: '0 4px 15px rgba(255,215,0,0.3)',
+                    clipPath: 'none',
+                    borderRadius: '8px'
+                  }}
+                >
+                  <Lock size={16} /> DESBLOQUEAR CON VIP
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
