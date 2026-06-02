@@ -22,7 +22,7 @@ const GurusRanking = ({ nickname, userPoints }) => {
           🏆 Top 10 Gurús
         </h3>
         <p style={{ color: 'var(--text-dim)', fontSize: '0.8rem', fontFamily: 'Outfit', margin: 0 }}>
-          Acierta tus corazonadas. Los Top 3 del mes ganan VIP gratis.
+          Acierta tus corazonadas. Los Top 3 del mes ganan VIP gratis y participan por increíbles <strong style={{ color: 'var(--accent-secondary)' }}>sorteos mensuales</strong> (descuentos en Gyms, Cafeterías y más sponsors).
         </p>
       </div>
 
