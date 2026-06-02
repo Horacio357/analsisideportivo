@@ -11,6 +11,7 @@ import EffectivenessGauge from './components/EffectivenessGauge';
 import Corazonadas from './components/Corazonadas';
 import { translations } from './utils/translations';
 import { getPlayersData } from './store/useAppStore';
+import { triggerCelebration } from './utils/effects';
 import './index.css';
 
 const getTeamLogoPath = (teamName) => {
@@ -397,6 +398,7 @@ const App = () => {
                       className="pes-button" 
                       style={{ width: '100%', marginTop: '10px', padding: '8px', fontSize: '0.8rem' }}
                       onClick={() => {
+                        triggerCelebration();
                         setSelectedMatch(match);
                         setIsModalOpen(true);
                       }}
@@ -974,6 +976,7 @@ const App = () => {
         onClose={() => setIsVipModalOpen(false)} 
         t={t}
         onVipActivated={(email) => {
+          triggerCelebration();
           setIsVip(true);
           setVipEmail(email);
         }}

@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Trophy } from 'lucide-react';
+import { triggerCelebration } from '../utils/effects';
 
 const LandingPage = ({ onEnter, t }) => {
   return (
@@ -67,7 +68,10 @@ const LandingPage = ({ onEnter, t }) => {
             whileHover={{ scale: 1.05, boxShadow: '0 0 30px var(--accent-color)' }}
             whileTap={{ scale: 0.95 }}
             className="pes-button landing-btn" 
-            onClick={onEnter}
+            onClick={() => {
+              triggerCelebration();
+              onEnter();
+            }}
           >
             {t.enter}
           </motion.button>
