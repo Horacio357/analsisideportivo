@@ -8,6 +8,7 @@ import FloatingBot from './components/FloatingBot';
 import AnalysisModal from './components/AnalysisModal';
 import SubscriptionModal from './components/SubscriptionModal';
 import EffectivenessGauge from './components/EffectivenessGauge';
+import Corazonadas from './components/Corazonadas';
 import { translations } from './utils/translations';
 import { getPlayersData } from './store/useAppStore';
 import './index.css';
@@ -243,6 +244,7 @@ const App = () => {
           <nav style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
             <button className={activeTab === 'predictions' ? 'active-tab' : ''} onClick={() => setActiveTab('predictions')}>{t.predictions}</button>
             <button className={activeTab === 'analysis' ? 'active-tab' : ''} onClick={() => setActiveTab('analysis')}>{t.analysis}</button>
+            <button className={activeTab === 'corazonadas' ? 'active-tab' : ''} onClick={() => setActiveTab('corazonadas')}>Corazonadas</button>
             {isVip ? (
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'rgba(255,215,0,0.15)', border: '1px solid var(--accent-secondary)', borderRadius: '20px', padding: '5px 14px', fontSize: '0.72rem', color: 'var(--accent-secondary)', fontFamily: 'Orbitron', letterSpacing: '1px' }}>
                 👑 VIP ACTIVO
@@ -598,6 +600,8 @@ const App = () => {
             {/* Effectiveness Gauge */}
             <EffectivenessGauge league={league} />
           </>
+        ) : activeTab === 'corazonadas' ? (
+          <Corazonadas league={league} matches={matches} players={players} getTeamLogoPath={getTeamLogoPath} />
         ) : (() => {
           // PLAYER ANALYSIS DASHBOARD VIEW
           const currentPlayer = players[selectedPlayer] || players[0] || { name: 'LIONEL MESSI', team: 'Argentina', stats: { shooting: 94, passing: 96, dribbling: 95, physical: 70, defense: 35, speed: 82 }, bio: 'Cargando...' };
@@ -876,9 +880,7 @@ const App = () => {
                     background: 'rgba(0,255,136,0.04)', 
                     padding: '8px 12px', 
                     borderRadius: '8px', 
-                    border: '1px solid rgba(0,255,136,0.1)',
-                    display: 'flex',
-                    justifyContent: 'space-between'
+                    border: '1px solid rgba(0,255,136,0.1)'
                   }}>
                     <span style={{ fontSize: '0.7rem', color: 'var(--text-dim)' }}>Tip Recomendado:</span>
                     <span style={{ fontSize: '0.75rem', color: 'var(--accent-color)', fontWeight: 'bold', fontFamily: 'Orbitron', letterSpacing: '0.5px' }}>MÁS DE 1.5 TIROS</span>
