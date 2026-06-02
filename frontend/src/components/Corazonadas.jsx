@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement } from 'chart.js';
 import { Doughnut, Bar } from 'react-chartjs-2';
 import GurusRanking from './GurusRanking';
+import { playSound } from '../utils/sounds';
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement);
 
@@ -13,9 +14,12 @@ const Corazonadas = ({ league, matches, players, getTeamLogoPath }) => {
   // States to keep track of user votes
   const [votes, setVotes] = useState({}); // { matchId: { winner: 'home'/'draw'/'away', mvp: playerId, scorer: playerId } }
   const [nickname, setNickname] = useState('');
+  const [email, setEmail] = useState('');
   const [isRegistered, setIsRegistered] = useState(false);
+  const [showWelcome, setShowWelcome] = useState(false);
   const [userPoints, setUserPoints] = useState(150);
   const [tempName, setTempName] = useState('');
+  const [tempEmail, setTempEmail] = useState('');
 
   if (!isAllowed) {
     return (
@@ -40,6 +44,7 @@ const Corazonadas = ({ league, matches, players, getTeamLogoPath }) => {
   }
 
   const handleVote = (matchId, category, value) => {
+    playSound('coin');
     setVotes(prev => {
       const isNewVote = !prev[matchId]?.[category];
       if (isNewVote) {
@@ -81,21 +86,45 @@ const Corazonadas = ({ league, matches, players, getTeamLogoPath }) => {
 
       {matches.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-dim)' }}>No hay partidos disponibles.</div>
+      ) : showWelcome ? (
+        <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="glass-panel" style={{ maxWidth: '400px', margin: '0 auto', padding: '40px', textAlign: 'center', borderRadius: '12px', border: '2px solid var(--accent-color)' }}>
+          <h2 className="heading-font" style={{ fontSize: '2rem', color: 'var(--accent-color)', marginBottom: '10px' }}>¡BIENVENIDO!</h2>
+          <p style={{ color: '#fff', fontSize: '1.2rem', fontFamily: 'Orbitron' }}>{nickname}</p>
+          <p style={{ color: 'var(--text-dim)', fontSize: '0.9rem', marginTop: '15px' }}>Preparando el tablero...</p>
+        </motion.div>
       ) : !isRegistered ? (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="glass-panel" style={{ maxWidth: '400px', margin: '0 auto', padding: '30px', textAlign: 'center', borderRadius: '12px' }}>
           <h3 className="heading-font" style={{ fontSize: '1.2rem', marginBottom: '15px' }}>Entrar al Ranking</h3>
-          <p style={{ color: 'var(--text-dim)', fontSize: '0.9rem', marginBottom: '20px', fontFamily: 'Outfit' }}>Ingresa un apodo para registrar tus corazonadas, ganar puntos y competir por el VIP gratuito.</p>
+          <p style={{ color: 'var(--text-dim)', fontSize: '0.9rem', marginBottom: '20px', fontFamily: 'Outfit' }}>Ingresa un apodo y tu email para registrar tus corazonadas, ganar puntos y competir por el VIP gratuito.</p>
           <input 
             type="text" 
             placeholder="Tu Apodo (Ej. ReyDelFutbol)" 
             value={tempName}
             onChange={(e) => setTempName(e.target.value)}
+            style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid var(--accent-color)', borderRadius: '8px', color: '#fff', outline: 'none', marginBottom: '10px', fontFamily: 'Outfit' }}
+          />
+          <input 
+            type="email" 
+            placeholder="Tu Email" 
+            value={tempEmail}
+            onChange={(e) => setTempEmail(e.target.value)}
             style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid var(--accent-color)', borderRadius: '8px', color: '#fff', outline: 'none', marginBottom: '15px', fontFamily: 'Outfit' }}
           />
           <button 
-            disabled={!tempName.trim()}
-            onClick={() => { if(tempName.trim()) { setNickname(tempName.trim()); setIsRegistered(true); } }}
-            style={{ width: '100%', padding: '12px', background: tempName.trim() ? 'var(--accent-color)' : '#444', color: tempName.trim() ? '#000' : '#888', fontWeight: 'bold', borderRadius: '8px', cursor: tempName.trim() ? 'pointer' : 'not-allowed', border: 'none', transition: 'all 0.2s' }}
+            disabled={!tempName.trim() || !tempEmail.trim()}
+            onClick={() => { 
+              if(tempName.trim() && tempEmail.trim()) { 
+                setNickname(tempName.trim()); 
+                setEmail(tempEmail.trim());
+                setShowWelcome(true);
+                playSound('welcome');
+                setTimeout(() => {
+                  setShowWelcome(false);
+                  setIsRegistered(true);
+                }, 2000);
+              } 
+            }}
+            style={{ width: '100%', padding: '12px', background: (tempName.trim() && tempEmail.trim()) ? 'var(--accent-color)' : '#444', color: (tempName.trim() && tempEmail.trim()) ? '#000' : '#888', fontWeight: 'bold', borderRadius: '8px', cursor: (tempName.trim() && tempEmail.trim()) ? 'pointer' : 'not-allowed', border: 'none', transition: 'all 0.2s' }}
           >
             Comenzar a Votar
           </button>
