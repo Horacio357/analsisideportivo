@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement } from 'chart.js';
 import { Doughnut, Bar } from 'react-chartjs-2';
+import GurusRanking from './GurusRanking';
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement);
 
@@ -11,6 +12,10 @@ const Corazonadas = ({ league, matches, players, getTeamLogoPath }) => {
 
   // States to keep track of user votes
   const [votes, setVotes] = useState({}); // { matchId: { winner: 'home'/'draw'/'away', mvp: playerId, scorer: playerId } }
+  const [nickname, setNickname] = useState('');
+  const [isRegistered, setIsRegistered] = useState(false);
+  const [userPoints, setUserPoints] = useState(150);
+  const [tempName, setTempName] = useState('');
 
   if (!isAllowed) {
     return (
@@ -35,13 +40,19 @@ const Corazonadas = ({ league, matches, players, getTeamLogoPath }) => {
   }
 
   const handleVote = (matchId, category, value) => {
-    setVotes(prev => ({
-      ...prev,
-      [matchId]: {
-        ...prev[matchId],
-        [category]: value
+    setVotes(prev => {
+      const isNewVote = !prev[matchId]?.[category];
+      if (isNewVote) {
+        setUserPoints(p => p + 10);
       }
-    }));
+      return {
+        ...prev,
+        [matchId]: {
+          ...prev[matchId],
+          [category]: value
+        }
+      };
+    });
   };
 
   // Mock initial community data generator based on match
@@ -70,8 +81,29 @@ const Corazonadas = ({ league, matches, players, getTeamLogoPath }) => {
 
       {matches.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-dim)' }}>No hay partidos disponibles.</div>
+      ) : !isRegistered ? (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="glass-panel" style={{ maxWidth: '400px', margin: '0 auto', padding: '30px', textAlign: 'center', borderRadius: '12px' }}>
+          <h3 className="heading-font" style={{ fontSize: '1.2rem', marginBottom: '15px' }}>Entrar al Ranking</h3>
+          <p style={{ color: 'var(--text-dim)', fontSize: '0.9rem', marginBottom: '20px', fontFamily: 'Outfit' }}>Ingresa un apodo para registrar tus corazonadas, ganar puntos y competir por el VIP gratuito.</p>
+          <input 
+            type="text" 
+            placeholder="Tu Apodo (Ej. ReyDelFutbol)" 
+            value={tempName}
+            onChange={(e) => setTempName(e.target.value)}
+            style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid var(--accent-color)', borderRadius: '8px', color: '#fff', outline: 'none', marginBottom: '15px', fontFamily: 'Outfit' }}
+          />
+          <button 
+            disabled={!tempName.trim()}
+            onClick={() => { if(tempName.trim()) { setNickname(tempName.trim()); setIsRegistered(true); } }}
+            style={{ width: '100%', padding: '12px', background: tempName.trim() ? 'var(--accent-color)' : '#444', color: tempName.trim() ? '#000' : '#888', fontWeight: 'bold', borderRadius: '8px', cursor: tempName.trim() ? 'pointer' : 'not-allowed', border: 'none', transition: 'all 0.2s' }}
+          >
+            Comenzar a Votar
+          </button>
+        </motion.div>
       ) : (
-        matches.map(match => {
+        <div style={{ display: 'flex', gap: '25px', flexWrap: 'wrap', alignItems: 'flex-start' }}>
+          <div style={{ flex: '1 1 65%', minWidth: '300px' }}>
+            {matches.map(match => {
           const userVote = votes[match.id] || {};
           const commData = getCommunityData(match.id, 'winner');
 
@@ -266,7 +298,12 @@ const Corazonadas = ({ league, matches, players, getTeamLogoPath }) => {
               </div>
             </motion.div>
           );
-        })
+        })}
+          </div>
+          <div style={{ flex: '1 1 30%', minWidth: '280px', position: 'sticky', top: '20px' }}>
+            <GurusRanking nickname={nickname} userPoints={userPoints} />
+          </div>
+        </div>
       )}
     </div>
   );
