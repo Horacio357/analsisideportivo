@@ -244,7 +244,7 @@ const App = () => {
           <nav style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
             <button className={activeTab === 'predictions' ? 'active-tab' : ''} onClick={() => setActiveTab('predictions')}>{t.predictions}</button>
             <button className={activeTab === 'analysis' ? 'active-tab' : ''} onClick={() => setActiveTab('analysis')}>{t.analysis}</button>
-            <button className={activeTab === 'corazonadas' ? 'active-tab' : ''} onClick={() => setActiveTab('corazonadas')}>Corazonadas</button>
+            <button className={activeTab === 'corazonadas' ? 'active-tab' : ''} onClick={() => setActiveTab('corazonadas')}>CORAZONADAS</button>
             {isVip ? (
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'rgba(255,215,0,0.15)', border: '1px solid var(--accent-secondary)', borderRadius: '20px', padding: '5px 14px', fontSize: '0.72rem', color: 'var(--accent-secondary)', fontFamily: 'Orbitron', letterSpacing: '1px' }}>
                 👑 VIP ACTIVO

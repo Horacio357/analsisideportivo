@@ -148,14 +148,15 @@ const Corazonadas = ({ league, matches, players, getTeamLogoPath }) => {
           };
 
           const chartOptions = {
+            indexAxis: 'y',
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-              legend: { position: 'bottom', labels: { color: '#fff', font: { family: 'Outfit', size: 10 } } }
+              legend: { display: false }
             },
             scales: {
-              y: { display: false },
-              x: { ticks: { color: '#aaa', font: { size: 9 } }, grid: { display: false } }
+              x: { display: false },
+              y: { ticks: { color: '#aaa', font: { size: 9, family: 'Orbitron' } }, grid: { display: false } }
             }
           };
 
@@ -201,20 +202,23 @@ const Corazonadas = ({ league, matches, players, getTeamLogoPath }) => {
                   </div>
                   <div style={{ display: 'flex', gap: '5px', justifyContent: 'center' }}>
                     <button 
+                      disabled={!!userVote.winner}
                       onClick={() => handleVote(match.id, 'winner', 'home')}
-                      style={{ padding: '6px 10px', fontSize: '0.75rem', borderRadius: '6px', background: userVote.winner === 'home' ? 'var(--accent-color)' : 'rgba(255,255,255,0.05)', color: userVote.winner === 'home' ? '#000' : '#fff', border: '1px solid var(--accent-color)', cursor: 'pointer', transition: 'all 0.2s', flex: 1 }}
+                      style={{ padding: '6px 10px', fontSize: '0.75rem', borderRadius: '6px', background: userVote.winner === 'home' ? 'var(--accent-color)' : 'rgba(255,255,255,0.05)', color: userVote.winner === 'home' ? '#000' : '#fff', border: '1px solid var(--accent-color)', cursor: userVote.winner ? 'not-allowed' : 'pointer', transition: 'all 0.2s', flex: 1, opacity: userVote.winner && userVote.winner !== 'home' ? 0.3 : 1 }}
                     >
                       Local
                     </button>
                     <button 
+                      disabled={!!userVote.winner}
                       onClick={() => handleVote(match.id, 'winner', 'draw')}
-                      style={{ padding: '6px 10px', fontSize: '0.75rem', borderRadius: '6px', background: userVote.winner === 'draw' ? '#888' : 'rgba(255,255,255,0.05)', color: userVote.winner === 'draw' ? '#000' : '#fff', border: '1px solid #888', cursor: 'pointer', transition: 'all 0.2s', flex: 1 }}
+                      style={{ padding: '6px 10px', fontSize: '0.75rem', borderRadius: '6px', background: userVote.winner === 'draw' ? '#888' : 'rgba(255,255,255,0.05)', color: userVote.winner === 'draw' ? '#000' : '#fff', border: '1px solid #888', cursor: userVote.winner ? 'not-allowed' : 'pointer', transition: 'all 0.2s', flex: 1, opacity: userVote.winner && userVote.winner !== 'draw' ? 0.3 : 1 }}
                     >
                       Empate
                     </button>
                     <button 
+                      disabled={!!userVote.winner}
                       onClick={() => handleVote(match.id, 'winner', 'away')}
-                      style={{ padding: '6px 10px', fontSize: '0.75rem', borderRadius: '6px', background: userVote.winner === 'away' ? '#ff4444' : 'rgba(255,255,255,0.05)', color: userVote.winner === 'away' ? '#000' : '#fff', border: '1px solid #ff4444', cursor: 'pointer', transition: 'all 0.2s', flex: 1 }}
+                      style={{ padding: '6px 10px', fontSize: '0.75rem', borderRadius: '6px', background: userVote.winner === 'away' ? '#ff4444' : 'rgba(255,255,255,0.05)', color: userVote.winner === 'away' ? '#000' : '#fff', border: '1px solid #ff4444', cursor: userVote.winner ? 'not-allowed' : 'pointer', transition: 'all 0.2s', flex: 1, opacity: userVote.winner && userVote.winner !== 'away' ? 0.3 : 1 }}
                     >
                       Visita
                     </button>
@@ -228,9 +232,10 @@ const Corazonadas = ({ league, matches, players, getTeamLogoPath }) => {
                     <Bar data={mvpChartData} options={chartOptions} />
                   </div>
                   <select 
+                    disabled={!!userVote.mvp}
                     value={userVote.mvp || ''} 
                     onChange={(e) => handleVote(match.id, 'mvp', e.target.value)}
-                    style={{ width: '100%', padding: '8px', background: '#0d1117', color: '#fff', border: '1px solid var(--accent-color)', borderRadius: '6px', fontSize: '0.8rem', outline: 'none' }}
+                    style={{ width: '100%', padding: '8px', background: '#0d1117', color: '#fff', border: '1px solid var(--accent-color)', borderRadius: '6px', fontSize: '0.8rem', outline: 'none', cursor: userVote.mvp ? 'not-allowed' : 'pointer', opacity: userVote.mvp ? 0.7 : 1 }}
                   >
                     <option value="" disabled>Votar por el MVP...</option>
                     {displayPlayers.map(p => (
@@ -246,9 +251,10 @@ const Corazonadas = ({ league, matches, players, getTeamLogoPath }) => {
                     <Bar data={scorerChartData} options={{...chartOptions, plugins: {...chartOptions.plugins, legend: {display: false}}}} />
                   </div>
                   <select 
+                    disabled={!!userVote.scorer}
                     value={userVote.scorer || ''} 
                     onChange={(e) => handleVote(match.id, 'scorer', e.target.value)}
-                    style={{ width: '100%', padding: '8px', background: '#0d1117', color: '#fff', border: '1px solid #ff4444', borderRadius: '6px', fontSize: '0.8rem', outline: 'none' }}
+                    style={{ width: '100%', padding: '8px', background: '#0d1117', color: '#fff', border: '1px solid #ff4444', borderRadius: '6px', fontSize: '0.8rem', outline: 'none', cursor: userVote.scorer ? 'not-allowed' : 'pointer', opacity: userVote.scorer ? 0.7 : 1 }}
                   >
                     <option value="" disabled>Votar por el Goleador...</option>
                     {displayPlayers.map(p => (
