@@ -39,6 +39,27 @@ export const playSound = (type) => {
       
       osc.start(ctx.currentTime);
       osc.stop(ctx.currentTime + 0.3);
+    } else if (type === 'bot') {
+      // Sonido amigable de bot (doble beep agudo)
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      
+      osc.frequency.setValueAtTime(1500, ctx.currentTime);
+      gain.gain.setValueAtTime(0, ctx.currentTime);
+      gain.gain.linearRampToValueAtTime(0.1, ctx.currentTime + 0.02);
+      gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.1);
+      
+      osc.frequency.setValueAtTime(2000, ctx.currentTime + 0.15);
+      gain.gain.setValueAtTime(0, ctx.currentTime + 0.15);
+      gain.gain.linearRampToValueAtTime(0.1, ctx.currentTime + 0.17);
+      gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.3);
+      
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.35);
     }
   } catch (e) {
     console.log("Audio no soportado o bloqueado por el navegador");

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MessageSquare, X, Bot, ChevronRight, Mail, CreditCard } from 'lucide-react';
+import { playSound } from '../utils/sounds';
 
 const FloatingBot = ({ t }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -119,7 +120,10 @@ const FloatingBot = ({ t }) => {
         transition={!isOpen ? { repeat: Infinity, duration: 1.5, ease: "easeInOut" } : {}}
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.95 }}
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => {
+          if (!isOpen) playSound('bot');
+          setIsOpen(!isOpen);
+        }}
         className="pes-button"
         style={{ 
           position: 'fixed',
