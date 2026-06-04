@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, CreditCard, CheckCircle, ShieldCheck, ArrowRight, Mail, Star, Crown, Zap } from 'lucide-react';
 import axios from 'axios';
+import { initMercadoPago, Wallet } from '@mercadopago/sdk-react';
+
+initMercadoPago(import.meta.env.VITE_MP_PUBLIC_KEY, { locale: 'es-AR' });
 
 const BENEFITS = [
   'Predicciones VIP con IA avanzada',
@@ -19,8 +22,9 @@ const PLANS = [
 ];
 
 const SubscriptionModal = ({ isOpen, onClose, t, onVipActivated }) => {
-  const [step, setStep] = useState('plan'); // 'plan' | 'loading' | 'success'
+  const [step, setStep] = useState('plan'); // 'plan' | 'loading' | 'success' | 'wallet'
   const [email, setEmail] = useState('');
+  const [preferenceId, setPreferenceId] = useState(null);
   const [emailError, setEmailError] = useState('');
   const [selectedPlan, setSelectedPlan] = useState(PLANS[0]);
 
@@ -44,8 +48,11 @@ const SubscriptionModal = ({ isOpen, onClose, t, onVipActivated }) => {
         plan_id: selectedPlan.id
       });
 
-      // Real MP token configured — redirect to checkout
-      if (response.data?.init_point) {
+      // Real MP token configured — render Wallet brick
+      if (response.data?.id) {
+        setPreferenceId(response.data.id);
+        setStep('wallet');
+      } else if (response.data?.init_point) {
         window.location.href = response.data.init_point;
       } else {
         runDemoFlow();
@@ -68,6 +75,7 @@ const SubscriptionModal = ({ isOpen, onClose, t, onVipActivated }) => {
     setStep('plan');
     setEmail('');
     setEmailError('');
+    setPreferenceId(null);
     onClose();
   };
 
@@ -210,6 +218,30 @@ const SubscriptionModal = ({ isOpen, onClose, t, onVipActivated }) => {
                 }} />
               ))}
             </div>
+          </motion.div>
+        )}
+
+        {/* ─── WALLET SCREEN ─── */}
+        {step === 'wallet' && (
+          <motion.div
+            key="wallet"
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.9, opacity: 0 }}
+            className="glass-panel"
+            style={{ width: '100%', maxWidth: '420px', textAlign: 'center', border: '2px solid var(--accent-secondary)', padding: '30px 20px', position: 'relative' }}
+          >
+            <button onClick={handleClose} style={{ position: 'absolute', top: '15px', right: '15px', background: 'none', border: 'none', color: '#fff', cursor: 'pointer', opacity: 0.6 }}>
+              <X size={20} />
+            </button>
+            <h3 className="heading-font" style={{ color: 'var(--accent-secondary)', marginBottom: '8px' }}>COMPLETA TU PAGO</h3>
+            <p style={{ color: 'var(--text-dim)', fontSize: '0.85rem', marginBottom: '20px' }}>Paga de forma segura con Mercado Pago</p>
+            
+            {preferenceId && (
+              <div style={{ background: 'rgba(255,255,255,0.05)', borderRadius: '12px', padding: '15px', display: 'flex', justifyContent: 'center' }}>
+                <Wallet initialization={{ preferenceId }} customization={{ texts: { valueProp: 'smart_option' } }} />
+              </div>
+            )}
           </motion.div>
         )}
 

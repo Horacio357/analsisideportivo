@@ -263,7 +263,10 @@ async def create_preference(item: dict):
         if "init_point" not in preference:
             raise HTTPException(status_code=400, detail=f"MP Error: {preference}")
 
-        return {"init_point": preference["init_point"]}
+        return {
+            "init_point": preference["init_point"],
+            "id": preference["id"]
+        }
     except HTTPException:
         raise
     except Exception as e:
