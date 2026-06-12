@@ -8,7 +8,7 @@ import { playSound } from '../utils/sounds';
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement);
 
 const Corazonadas = ({ league, matches, players, getTeamLogoPath }) => {
-  const allowedLeagues = ['AR', 'US', 'MX', 'ES'];
+  const allowedLeagues = ['AR', 'US', 'MX', 'ES', 'WC', 'EN', 'DE', 'IT', 'BR', 'EU', 'FR', 'PT'];
   const isAllowed = allowedLeagues.includes(league);
 
   // States to keep track of user votes
@@ -34,7 +34,7 @@ const Corazonadas = ({ league, matches, players, getTeamLogoPath }) => {
         </h2>
         <p style={{ color: 'var(--text-dim)', fontFamily: 'Outfit' }}>
           La sección de <strong>Corazonadas de la Comunidad</strong> está disponible actualmente solo para las ligas: 
-          <br/>🇦🇷 Argentina, 🇺🇸 Estados Unidos, 🇲🇽 México y 🇪🇸 España.
+          <br/>🇦🇷 Argentina, 🇺🇸 Estados Unidos, 🇲🇽 México, 🇪🇸 España y 🌍 Mundial.
         </p>
         <p style={{ color: 'var(--accent-color)', marginTop: '20px', fontFamily: 'Orbitron', fontSize: '0.8rem' }}>
           ¡Próximamente en más ligas!
@@ -164,9 +164,70 @@ const Corazonadas = ({ league, matches, players, getTeamLogoPath }) => {
             ],
           };
 
-          // Players for this match (approximate)
-          const matchPlayers = players.filter(p => p.team.includes(match.home) || p.team.includes(match.away));
-          const displayPlayers = matchPlayers.length >= 3 ? matchPlayers.slice(0, 5) : players.slice(0, 5); // fallback
+          // Mapa de traducción inglés → español para nombres de equipos nacionales
+          const teamAliases = {
+            // América del Norte y Central
+            'usa': 'ee.uu.', 'united states': 'ee.uu.', 'united states of america': 'ee.uu.',
+            'canada': 'canada', 'costa rica': 'costa rica',
+            'panama': 'panama', 'haiti': 'haiti', 'curacao': 'curacao',
+            // América del Sur
+            'argentina': 'argentina', 'brazil': 'brasil',
+            'colombia': 'colombia', 'uruguay': 'uruguay', 'chile': 'chile',
+            'ecuador': 'ecuador', 'venezuela': 'venezuela', 'peru': 'peru',
+            'bolivia': 'bolivia', 'paraguay': 'paraguay',
+            // Europa
+            'france': 'francia', 'england': 'inglaterra', 'spain': 'espana',
+            'germany': 'alemania', 'italy': 'italia', 'portugal': 'portugal',
+            'netherlands': 'paises bajos', 'holland': 'paises bajos',
+            'croatia': 'croacia', 'belgium': 'belgica', 'switzerland': 'suiza',
+            'austria': 'austria', 'scotland': 'escocia', 'denmark': 'dinamarca',
+            'sweden': 'suecia', 'norway': 'noruega', 'poland': 'polonia',
+            'ukraine': 'ucrania', 'serbia': 'serbia', 'hungary': 'hungria',
+            'czechia': 'republica checa', 'czech republic': 'republica checa',
+            'slovakia': 'eslovaquia', 'romania': 'rumania', 'turkey': 'turquia',
+            'greece': 'grecia', 'albania': 'albania', 'slovenia': 'eslovenia',
+            'bosnia and herzegovina': 'bosnia y herzegovina',
+            'bosnia-herzegovina': 'bosnia y herzegovina',
+            'bosnia-h': 'bosnia y herzegovina',
+            // África
+            'south africa': 'sudafrica', 'morocco': 'marruecos', 'senegal': 'senegal',
+            'nigeria': 'nigeria', 'egypt': 'egipto', 'ghana': 'ghana',
+            'cameroon': 'camerun', "cote d'ivoire": 'costa de marfil',
+            'ivory coast': 'costa de marfil', 'mali': 'mali', 'tunisia': 'tunez',
+            'algeria': 'argelia', 'uganda': 'uganda',
+            // Asia
+            'japan': 'japon',
+            'south korea': 'corea del sur', 'korea republic': 'corea del sur',
+            'korea dpr': 'corea del norte', 'north korea': 'corea del norte',
+            'iran': 'iran', 'iraq': 'irak',
+            'australia': 'australia', 'saudi arabia': 'arabia saudita',
+            'qatar': 'qatar', 'china': 'china', 'india': 'india',
+            'uzbekistan': 'uzbekistan', 'jordan': 'jordania',
+            // Oceanía
+            'new zealand': 'nueva zelanda',
+          };
+
+          // Normaliza y busca alias para un nombre de equipo
+          const normalizeTeam = (name) => {
+            if (!name) return '';
+            const n = name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+            return teamAliases[n] || n;
+          };
+
+          // Fuzzy match con normalización y aliases
+          const fuzzyMatch = (playerTeam, matchTeam) => {
+            if (!playerTeam || !matchTeam) return false;
+            const pt = normalizeTeam(playerTeam);
+            const mt = normalizeTeam(matchTeam);
+            if (pt === mt) return true;
+            if (pt.includes(mt) || mt.includes(pt)) return true;
+            return mt.split(' ').some(word => word.length > 3 && pt.includes(word));
+          };
+
+          const homePlayers = players.filter(p => fuzzyMatch(p.team, match.home));
+          const awayPlayers = players.filter(p => fuzzyMatch(p.team, match.away));
+          const matchPlayers = [...homePlayers, ...awayPlayers];
+          const displayPlayers = matchPlayers.length >= 2 ? matchPlayers.slice(0, 10) : players.slice(0, 5);
 
           // Mock MVP Data
           const mvpVotes = displayPlayers.map((p, i) => {

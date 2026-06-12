@@ -19,7 +19,7 @@ ChartJS.register(
   Legend
 );
 
-const RadarChart = ({ stats, labels, name, color = '#00ff88' }) => {
+const RadarChart = ({ stats, labels, name, color = '#00ff88', datasets }) => {
   // Hook to check for mobile screens dynamically
   const [isMobile, setIsMobile] = React.useState(false);
   React.useEffect(() => {
@@ -33,25 +33,35 @@ const RadarChart = ({ stats, labels, name, color = '#00ff88' }) => {
 
   const labelSize = isMobile ? 8 : 10;
 
-  // Helper to ensure color works with opacity even if it's a CSS variable or hex
-  // For simplicity and performance, we'll assume hex colors for now as Chart.js
-  // prefers resolved values.
+  const chartDatasets = datasets ? datasets.map(ds => ({
+    label: ds.name,
+    data: ds.stats,
+    backgroundColor: ds.color.startsWith('#') ? `${ds.color}44` : 'rgba(0, 255, 136, 0.2)',
+    borderColor: ds.color,
+    borderWidth: 3,
+    pointBackgroundColor: ds.color,
+    pointBorderColor: '#fff',
+    pointHoverBackgroundColor: '#fff',
+    pointHoverBorderColor: ds.color,
+    fill: true,
+  })) : [
+    {
+      label: name,
+      data: stats,
+      backgroundColor: color.startsWith('#') ? `${color}44` : 'rgba(0, 255, 136, 0.2)',
+      borderColor: color,
+      borderWidth: 3,
+      pointBackgroundColor: color,
+      pointBorderColor: '#fff',
+      pointHoverBackgroundColor: '#fff',
+      pointHoverBorderColor: color,
+      fill: true,
+    }
+  ];
+
   const data = {
     labels: labels || ['Shooting', 'Passing', 'Dribbling', 'Physical', 'Defense', 'Speed'],
-    datasets: [
-      {
-        label: name,
-        data: stats,
-        backgroundColor: color.startsWith('#') ? `${color}44` : 'rgba(0, 255, 136, 0.2)', // 25% opacity
-        borderColor: color,
-        borderWidth: 3,
-        pointBackgroundColor: color,
-        pointBorderColor: '#fff',
-        pointHoverBackgroundColor: '#fff',
-        pointHoverBorderColor: color,
-        fill: true,
-      },
-    ],
+    datasets: chartDatasets,
   };
 
   const options = {

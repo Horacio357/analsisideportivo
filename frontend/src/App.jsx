@@ -9,8 +9,9 @@ import AnalysisModal from './components/AnalysisModal';
 import SubscriptionModal from './components/SubscriptionModal';
 import EffectivenessGauge from './components/EffectivenessGauge';
 import Corazonadas from './components/Corazonadas';
+import Fixture from './components/Fixture';
 import { translations } from './utils/translations';
-import { getPlayersData } from './store/useAppStore';
+import { getPlayersData, allMatchesFallback, fillFallbackBettingDetails, WC_KNOCKOUT } from './store/useAppStore';
 import { triggerCelebration } from './utils/effects';
 import './index.css';
 
@@ -113,6 +114,7 @@ const App = () => {
   const [isVip, setIsVip] = useState(false);
   const [vipEmail, setVipEmail] = useState('');
   const [analysisMode, setAnalysisMode] = useState('team'); // 'team' | 'player'
+  const [selectedTeams, setSelectedTeams] = useState([]); // array of team names for comparison
 
   const t = translations[lang];
 
@@ -122,56 +124,18 @@ const App = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        const allMatches = {
-          AR: [
-            { id: 1, home: 'Boca Juniors', away: 'River Plate', homeProb: 45, drawProb: 30, awayProb: 25, prediction: 'Local' },
-            { id: 2, home: 'Racing Club', away: 'Independiente', homeProb: 50, drawProb: 25, awayProb: 25, prediction: 'Local' },
-            { id: 3, home: 'San Lorenzo', away: 'Huracán', homeProb: 38, drawProb: 32, awayProb: 30, prediction: 'Empate' },
-          ],
-          BR: [
-            { id: 10, home: 'Flamengo', away: 'Palmeiras', homeProb: 45, drawProb: 25, awayProb: 30, prediction: 'Local' },
-            { id: 11, home: 'Corinthians', away: 'São Paulo', homeProb: 35, drawProb: 35, awayProb: 30, prediction: 'Empate' },
-            { id: 12, home: 'Atletico MG', away: 'Botafogo', homeProb: 52, drawProb: 22, awayProb: 26, prediction: 'Local' },
-          ],
-          EU: [
-            { id: 20, home: 'Real Madrid', away: 'Man City', homeProb: 38, drawProb: 24, awayProb: 38, prediction: 'Local' },
-            { id: 21, home: 'Bayern', away: 'Arsenal', homeProb: 42, drawProb: 28, awayProb: 30, prediction: 'Local' },
-            { id: 22, home: 'PSG', away: 'Barcelona', homeProb: 36, drawProb: 27, awayProb: 37, prediction: 'Empate' },
-          ],
-          ES: [
-            { id: 30, home: 'Real Madrid', away: 'Barcelona', homeProb: 44, drawProb: 24, awayProb: 32, prediction: 'Local' },
-            { id: 31, home: 'Atlético Madrid', away: 'Sevilla', homeProb: 50, drawProb: 25, awayProb: 25, prediction: 'Local' },
-            { id: 32, home: 'Athletic Club', away: 'Real Sociedad', homeProb: 40, drawProb: 30, awayProb: 30, prediction: 'Empate' },
-          ],
-          EN: [
-            { id: 40, home: 'Man City', away: 'Arsenal', homeProb: 48, drawProb: 22, awayProb: 30, prediction: 'Local' },
-            { id: 41, home: 'Liverpool', away: 'Chelsea', homeProb: 45, drawProb: 25, awayProb: 30, prediction: 'Local' },
-            { id: 42, home: 'Aston Villa', away: 'Tottenham', homeProb: 38, drawProb: 28, awayProb: 34, prediction: 'Empate' },
-          ],
-          DE: [
-            { id: 50, home: 'Bayern Munich', away: 'Borussia Dortmund', homeProb: 55, drawProb: 20, awayProb: 25, prediction: 'Local' },
-            { id: 51, home: 'Bayer Leverkusen', away: 'RB Leipzig', homeProb: 45, drawProb: 28, awayProb: 27, prediction: 'Local' },
-          ],
-          IT: [
-            { id: 60, home: 'Inter Milan', away: 'AC Milan', homeProb: 46, drawProb: 26, awayProb: 28, prediction: 'Local' },
-            { id: 61, home: 'Juventus', away: 'Napoli', homeProb: 38, drawProb: 30, awayProb: 32, prediction: 'Empate' },
-          ],
-          US: [
-            { id: 70, home: 'Inter Miami', away: 'LA Galaxy', homeProb: 60, drawProb: 20, awayProb: 20, prediction: 'Local' },
-            { id: 71, home: 'NY Red Bulls', away: 'Orlando City', homeProb: 40, drawProb: 30, awayProb: 30, prediction: 'Empate' },
-          ],
-          MX: [
-            { id: 80, home: 'Club América', away: 'Chivas', homeProb: 48, drawProb: 26, awayProb: 26, prediction: 'Local' },
-            { id: 81, home: 'Cruz Azul', away: 'Pumas UNAM', homeProb: 42, drawProb: 28, awayProb: 30, prediction: 'Local' },
-          ],
-        };
-
-        setMatches(allMatches[league] || []);
-
+        const response = await axios.get(`http://localhost:8000/matches?league_id=${league}`);
+        if (response.data && response.data.status === 'success' && response.data.matches && response.data.matches.length > 0) {
+          setMatches(response.data.matches);
+        } else {
+          // Empty or failed response from API, use fallback
+          const fallbackData = (allMatchesFallback[league] || []).map(m => fillFallbackBettingDetails(m, league));
+          setMatches(fallbackData);
+        }
       } catch (err) {
-        console.error("Error fetching data:", err);
+        console.warn("Error fetching data, using fallback:", err);
+        const fallbackData = (allMatchesFallback[league] || []).map(m => fillFallbackBettingDetails(m, league));
+        setMatches(fallbackData);
       } finally {
         setLoading(false);
       }
@@ -246,6 +210,7 @@ const App = () => {
             <button className={activeTab === 'predictions' ? 'active-tab' : ''} onClick={() => setActiveTab('predictions')}>{t.predictions}</button>
             <button className={activeTab === 'analysis' ? 'active-tab' : ''} onClick={() => setActiveTab('analysis')}>{t.analysis}</button>
             <button className={activeTab === 'corazonadas' ? 'active-tab' : ''} onClick={() => setActiveTab('corazonadas')}>CORAZONADAS</button>
+            <button className={activeTab === 'fixture' ? 'active-tab' : ''} onClick={() => setActiveTab('fixture')}>⚽ FIXTURE</button>
             {isVip ? (
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'rgba(255,215,0,0.15)', border: '1px solid var(--accent-secondary)', borderRadius: '20px', padding: '5px 14px', fontSize: '0.72rem', color: 'var(--accent-secondary)', fontFamily: 'Orbitron', letterSpacing: '1px' }}>
                 👑 VIP ACTIVO
@@ -303,6 +268,9 @@ const App = () => {
               <optgroup label="🌎 Norteamérica" style={{ background: '#0d1117', color: '#888', fontSize: '0.72rem', padding: '6px 0' }}>
                 <option value="US" style={{ background: '#0d1117', color: '#fff', padding: '10px 16px', fontSize: '0.9rem', lineHeight: '2' }}>🇺🇸 MLS (Estados Unidos)</option>
                 <option value="MX" style={{ background: '#0d1117', color: '#fff', padding: '10px 16px', fontSize: '0.9rem', lineHeight: '2' }}>🇲🇽 Liga MX (México)</option>
+              </optgroup>
+              <optgroup label="🌍 Internacional" style={{ background: '#0d1117', color: '#888', fontSize: '0.72rem', padding: '6px 0' }}>
+                <option value="WC" style={{ background: '#0d1117', color: '#fff', padding: '10px 16px', fontSize: '0.9rem', lineHeight: '2' }}>🏆 Copa del Mundo</option>
               </optgroup>
             </select>
             {/* Custom arrow */}
@@ -421,7 +389,7 @@ const App = () => {
                 {/* Mode toggle pills */}
                 <div style={{ display: 'flex', background: 'rgba(255,255,255,0.05)', borderRadius: '10px', padding: '4px', gap: '4px', margin: '0 auto' }}>
                   {[
-                    { id: 'team', icon: '/icons/equipo.png', label: 'Equipo' }, 
+                    { id: 'team', icon: '/icons/equipo.png', label: league === 'WC' ? 'Selección' : 'Equipo' }, 
                     { id: 'player', icon: '/icons/jugador.png', label: 'Jugador' }
                   ].map(m => (
                     <button
@@ -461,48 +429,116 @@ const App = () => {
 
               {/* ── TEAM VIEW ── */}
               {analysisMode === 'team' && (() => {
-                const teamData = {
-                  AR: { name: 'Boca Juniors', stats: [88, 82, 75, 78, 85, 80], color: '#3b82f6', form: 'VVEEV', goals: 28, conceded: 12, possession: '54%', wins: 12 },
-                  BR: { name: 'Flamengo', stats: [90, 85, 80, 82, 88, 75], color: '#ef4444', form: 'VVEVV', goals: 34, conceded: 15, possession: '58%', wins: 15 },
-                  EU: { name: 'Real Madrid', stats: [95, 90, 88, 85, 92, 80], color: '#f59e0b', form: 'VVVVV', goals: 42, conceded: 10, possession: '60%', wins: 18 },
-                  WC: { name: 'Argentina', stats: [94, 88, 92, 86, 95, 85], color: '#00c6ff', form: 'VVVVV', goals: 38, conceded: 8, possession: '62%', wins: 16 },
-                  ES: { name: 'Real Madrid', stats: [95, 90, 88, 85, 92, 80], color: '#f59e0b', form: 'VVVVV', goals: 42, conceded: 10, possession: '60%', wins: 18 },
-                  EN: { name: 'Manchester City', stats: [96, 88, 95, 84, 94, 82], color: '#00c6ff', form: 'VVEVV', goals: 45, conceded: 14, possession: '64%', wins: 17 },
-                  DE: { name: 'Bayern Munich', stats: [92, 84, 85, 88, 90, 78], color: '#ef4444', form: 'VVVEV', goals: 39, conceded: 16, possession: '59%', wins: 14 },
-                  IT: { name: 'Inter Milan', stats: [90, 92, 82, 86, 88, 74], color: '#3b82f6', form: 'VEVVV', goals: 31, conceded: 11, possession: '55%', wins: 13 },
-                  US: { name: 'Inter Miami', stats: [84, 72, 80, 76, 82, 70], color: '#ff44aa', form: 'VEVVE', goals: 29, conceded: 22, possession: '53%', wins: 11 },
-                  MX: { name: 'Club América', stats: [85, 80, 78, 82, 80, 72], color: '#ffd700', form: 'VPVVV', goals: 32, conceded: 18, possession: '56%', wins: 14 },
+                const allTeams = {
+                  WC: [
+                    { name: 'Argentina', stats: [92, 88, 90, 85, 90, 88], color: '#75aadb', form: 'VVVVV', goals: 24, conceded: 4, possession: '64%', wins: 7 },
+                    { name: 'Arabia Saudita', stats: [65, 62, 60, 68, 65, 58], color: '#ff0000', form: 'DVEVD', goals: 10, conceded: 15, possession: '42%', wins: 3 },
+                    { name: 'España', stats: [94, 86, 92, 80, 92, 90], color: '#c60b1e', form: 'VVVEV', goals: 26, conceded: 6, possession: '68%', wins: 6 },
+                    { name: 'Nueva Zelanda', stats: [62, 65, 58, 72, 60, 55], color: '#ffffff', form: 'EDVDE', goals: 8, conceded: 12, possession: '38%', wins: 2 },
+                    { name: 'Francia', stats: [95, 88, 86, 90, 88, 92], color: '#002395', form: 'VVVEV', goals: 22, conceded: 5, possession: '60%', wins: 6 },
+                    { name: 'Senegal', stats: [60, 62, 58, 70, 62, 50], color: '#fcdc04', form: 'VEEVD', goals: 7, conceded: 11, possession: '40%', wins: 2 },
+                    { name: 'México', stats: [82, 80, 78, 82, 80, 75], color: '#006847', form: 'VEVVE', goals: 14, conceded: 10, possession: '53%', wins: 4 },
+                    { name: 'Suecia', stats: [80, 82, 76, 85, 78, 78], color: '#006aa7', form: 'EVEVD', goals: 12, conceded: 11, possession: '50%', wins: 3 },
+                    { name: 'Inglaterra', stats: [92, 85, 84, 88, 86, 88], color: '#ffffff', form: 'VVEEV', goals: 18, conceded: 8, possession: '58%', wins: 5 },
+                    { name: 'Ecuador', stats: [80, 84, 75, 88, 80, 76], color: '#ffdd00', form: 'VEVVE', goals: 11, conceded: 9, possession: '48%', wins: 3 },
+                    { name: 'Brasil', stats: [90, 82, 85, 84, 88, 92], color: '#fedf00', form: 'VVVEV', goals: 20, conceded: 9, possession: '60%', wins: 5 },
+                    { name: 'Uruguay', stats: [85, 88, 80, 90, 85, 82], color: '#00a6da', form: 'VVEVV', goals: 16, conceded: 8, possession: '52%', wins: 5 },
+                    { name: 'Países Bajos', stats: [88, 86, 84, 82, 86, 84], color: '#ff9b00', form: 'VVEVV', goals: 15, conceded: 10, possession: '56%', wins: 4 },
+                    { name: 'Colombia', stats: [86, 82, 85, 86, 82, 85], color: '#fcd116', form: 'VVVVV', goals: 19, conceded: 7, possession: '55%', wins: 6 },
+                    { name: 'Portugal', stats: [90, 84, 86, 82, 88, 86], color: '#ff0000', form: 'VVEVE', goals: 18, conceded: 9, possession: '58%', wins: 4 },
+                    { name: 'Croacia', stats: [84, 88, 90, 80, 85, 80], color: '#ffffff', form: 'EEVEV', goals: 12, conceded: 10, possession: '54%', wins: 3 },
+                    { name: 'EE.UU.', stats: [82, 80, 82, 85, 78, 80], color: '#002868', form: 'EVEVV', goals: 13, conceded: 11, possession: '52%', wins: 3 },
+                    { name: 'Marruecos', stats: [85, 86, 84, 88, 82, 85], color: '#c1272d', form: 'VVVEV', goals: 16, conceded: 8, possession: '54%', wins: 5 },
+                  ],
+                  AR: [
+                    { name: 'Boca Juniors', stats: [88, 82, 75, 78, 85, 80], color: '#3b82f6', form: 'VVEEV', goals: 28, conceded: 12, possession: '54%', wins: 12 },
+                    { name: 'River Plate', stats: [90, 85, 82, 76, 88, 85], color: '#ef4444', form: 'VVEVV', goals: 32, conceded: 10, possession: '58%', wins: 14 }
+                  ],
+                  BR: [{ name: 'Flamengo', stats: [90, 85, 80, 82, 88, 75], color: '#ef4444', form: 'VVEVV', goals: 34, conceded: 15, possession: '58%', wins: 15 }],
+                  EU: [{ name: 'Real Madrid', stats: [95, 90, 88, 85, 92, 80], color: '#f59e0b', form: 'VVVVV', goals: 42, conceded: 10, possession: '60%', wins: 18 }],
+                  ES: [{ name: 'Real Madrid', stats: [95, 90, 88, 85, 92, 80], color: '#f59e0b', form: 'VVVVV', goals: 42, conceded: 10, possession: '60%', wins: 18 }],
+                  EN: [{ name: 'Manchester City', stats: [96, 88, 95, 84, 94, 82], color: '#00c6ff', form: 'VVEVV', goals: 45, conceded: 14, possession: '64%', wins: 17 }],
+                  DE: [{ name: 'Bayern Munich', stats: [92, 84, 85, 88, 90, 78], color: '#ef4444', form: 'VVVEV', goals: 39, conceded: 16, possession: '59%', wins: 14 }],
+                  IT: [{ name: 'Inter Milan', stats: [90, 92, 82, 86, 88, 74], color: '#3b82f6', form: 'VEVVV', goals: 31, conceded: 11, possession: '55%', wins: 13 }],
+                  US: [{ name: 'Inter Miami', stats: [84, 72, 80, 76, 82, 70], color: '#ff44aa', form: 'VEVVE', goals: 29, conceded: 22, possession: '53%', wins: 11 }],
+                  MX: [{ name: 'Club América', stats: [85, 80, 78, 82, 80, 72], color: '#ffd700', form: 'VPVVV', goals: 32, conceded: 18, possession: '56%', wins: 14 }],
                 };
-                const team = teamData[league] || teamData.AR;
+                
+                const availableTeams = allTeams[league] || allTeams.WC;
+                const currentSelection = selectedTeams.length > 0 ? selectedTeams : [availableTeams[0].name];
+                const activeData = availableTeams.filter(t => currentSelection.includes(t.name));
+                const mainTeam = activeData[0] || availableTeams[0];
+
                 const formColors = { V: 'var(--accent-color)', E: '#888', P: '#ff4444' };
                 const formLabels = { V: 'V', E: 'E', P: 'P' };
                 return (
                   <motion.div key={league} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
                     <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-                      <h3 style={{ color: team.color, fontFamily: 'Orbitron', fontSize: '1.1rem', marginBottom: '4px' }}>{team.name}</h3>
+                      <h3 style={{ color: mainTeam.color, fontFamily: 'Orbitron', fontSize: '1.1rem', marginBottom: '4px' }}>
+                        {activeData.map(t => t.name).join(' vs ')}
+                      </h3>
                       <p style={{ color: 'var(--text-dim)', fontSize: '0.75rem', letterSpacing: '1px' }}>MÉTRICAS DE RENDIMIENTO</p>
                     </div>
-                    <RadarChart stats={team.stats} labels={['Ataque', 'Defensa', 'Posesión', 'Físico', 'Táctica', 'Cantera']} name={team.name} color={team.color} />
-                    {/* Stat cards */}
+
+                    {/* Team Selector */}
+                    {availableTeams.length > 1 && (
+                      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', justifyContent: 'center', marginBottom: '20px' }}>
+                        {availableTeams.map(t => {
+                          const isActive = currentSelection.includes(t.name);
+                          return (
+                            <div
+                              key={t.name}
+                              onClick={() => {
+                                if (isActive) {
+                                  if (currentSelection.length > 1) setSelectedTeams(currentSelection.filter(name => name !== t.name));
+                                } else {
+                                  if (currentSelection.length < 3) setSelectedTeams([...currentSelection, t.name]);
+                                }
+                              }}
+                              style={{
+                                padding: '4px 12px', borderRadius: '20px', cursor: 'pointer',
+                                fontSize: '0.75rem', fontFamily: 'Orbitron',
+                                border: `1px solid ${isActive ? t.color : 'rgba(255,255,255,0.1)'}`,
+                                background: isActive ? `${t.color}33` : 'rgba(0,0,0,0.2)',
+                                color: isActive ? '#fff' : 'var(--text-dim)',
+                                transition: 'all 0.2s'
+                              }}
+                            >
+                              {t.name}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+
+                    <RadarChart datasets={activeData} labels={['Ataque', 'Defensa', 'Posesión', 'Físico', 'Táctica', 'Cantera']} />
+                    {/* Stat cards (shows main selected team stats) */}
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginTop: '20px' }}>
                       {[
-                        { label: 'Goles a favor', value: team.goals },
-                        { label: 'Goles en contra', value: team.conceded },
-                        { label: 'Posesión media', value: team.possession },
-                        { label: 'Victorias', value: team.wins },
+                        { label: `Goles a favor (${mainTeam.name})`, value: mainTeam.goals },
+                        { label: 'Goles en contra', value: mainTeam.conceded },
+                        { label: 'Posesión media', value: mainTeam.possession },
+                        { label: 'Victorias', value: mainTeam.wins },
                       ].map((s, i) => (
-                        <div key={i} style={{ background: 'rgba(255,255,255,0.04)', borderRadius: '10px', padding: '12px', textAlign: 'center', border: `1px solid ${team.color}22` }}>
-                          <div style={{ fontSize: '1.3rem', fontWeight: 900, fontFamily: 'Orbitron', color: team.color }}>{s.value}</div>
+                        <div key={i} style={{ background: 'rgba(255,255,255,0.04)', borderRadius: '10px', padding: '12px', textAlign: 'center', border: `1px solid ${mainTeam.color}22` }}>
+                          <div style={{ fontSize: '1.3rem', fontWeight: 900, fontFamily: 'Orbitron', color: mainTeam.color }}>{s.value}</div>
                           <div style={{ fontSize: '0.68rem', color: 'var(--text-dim)', marginTop: '3px' }}>{s.label}</div>
                         </div>
                       ))}
                     </div>
                     {/* Form strip */}
                     <div style={{ marginTop: '18px' }}>
-                      <div style={{ fontSize: '0.68rem', color: 'var(--text-dim)', letterSpacing: '1px', marginBottom: '8px' }}>ÚLTIMOS 5 PARTIDOS</div>
+                      <div style={{ fontSize: '0.68rem', color: 'var(--text-dim)', letterSpacing: '1px', marginBottom: '8px' }}>ÚLTIMOS 5 PARTIDOS ({mainTeam.name})</div>
                       <div style={{ display: 'flex', gap: '8px' }}>
-                        {team.form.split('').map((r, i) => (
-                          <div key={i} style={{ width: '36px', height: '36px', borderRadius: '8px', background: formColors[r], display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.85rem', color: '#000' }}>{formLabels[r]}</div>
+                        {mainTeam.form.split('').map((result, i) => (
+                          <div key={i} style={{
+                            width: '24px', height: '24px', borderRadius: '4px',
+                            background: formColors[result], color: '#fff',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            fontSize: '0.7rem', fontWeight: 700
+                          }}>
+                            {formLabels[result]}
+                          </div>
                         ))}
                       </div>
                     </div>
@@ -604,49 +640,24 @@ const App = () => {
           </>
         ) : activeTab === 'corazonadas' ? (
           <Corazonadas league={league} matches={matches} players={players} getTeamLogoPath={getTeamLogoPath} />
+        ) : activeTab === 'fixture' ? (
+          <Fixture league={league} matches={matches} getTeamLogoPath={getTeamLogoPath} />
         ) : (() => {
           // PLAYER ANALYSIS DASHBOARD VIEW
           const currentPlayer = players[selectedPlayer] || players[0] || { name: 'LIONEL MESSI', team: 'Argentina', stats: { shooting: 94, passing: 96, dribbling: 95, physical: 70, defense: 35, speed: 82 }, bio: 'Cargando...' };
           
           // Helper to dynamically match players for the duel
           const getMatchPlayers = (match, playersArray) => {
-            let homeP = playersArray.find(p => p.team.toLowerCase() === match.home.toLowerCase());
-            let awayP = playersArray.find(p => p.team.toLowerCase() === match.away.toLowerCase());
+            const norm = (s) => s ? s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim() : '';
+            let homeP = playersArray.find(p => norm(p.team) === norm(match.home));
+            let awayP = playersArray.find(p => norm(p.team) === norm(match.away));
             
             if (!homeP) {
-              if (match.home.includes('Esp') || match.home.includes('Spain')) {
-                homeP = playersArray.find(p => p.name.includes('YAMAL')) || playersArray[2];
-              } else if (match.home.includes('Fran') || match.home.includes('France')) {
-                homeP = playersArray.find(p => p.name.includes('MBAPPÉ')) || playersArray[1];
-              } else if (match.home.includes('Ing') || match.home.includes('England')) {
-                homeP = playersArray.find(p => p.name.includes('BELLINGHAM')) || playersArray[4];
-              } else if (match.home.includes('Bra') || match.home.includes('Brazil')) {
-                homeP = playersArray.find(p => p.name.includes('VINICIUS')) || playersArray[3];
-              } else if (match.home.includes('Méx') || match.home.includes('Mexico')) {
-                homeP = playersArray.find(p => p.name.includes('GIMÉNEZ')) || playersArray[5];
-              } else {
-                homeP = playersArray[0] || { name: 'Player A', team: match.home, stats: { shooting: 80, passing: 80, dribbling: 80, physical: 80, defense: 80, speed: 80 }, bio: '' };
-              }
+                homeP = { name: `Figura (${match.home})`, team: match.home, stats: { shooting: 80, passing: 80, dribbling: 80, physical: 80, defense: 80, speed: 80 }, bio: '' };
             }
-            
             if (!awayP) {
-              if (match.away.includes('Jor') || match.away.includes('Jordan')) {
-                awayP = playersArray.find(p => p.name.includes('TAMARI')) || playersArray[playersArray.length - 1];
-              } else if (match.away.includes('Uru') || match.away.includes('Uruguay')) {
-                awayP = playersArray.find(p => p.name.includes('VALVERDE')) || playersArray[3];
-              } else if (match.away.includes('Col') || match.away.includes('Colombia')) {
-                awayP = playersArray.find(p => p.name.includes('DÍAZ')) || playersArray[7];
-              } else if (match.away.includes('Cro') || match.away.includes('Croatia')) {
-                awayP = playersArray.find(p => p.name.includes('MODRIC')) || playersArray[6];
-              } else if (match.away.includes('Mar') || match.away.includes('Morocco')) {
-                awayP = playersArray.find(p => p.name.includes('HAKIMI')) || playersArray[7];
-              } else if (match.away.includes('Sue') || match.away.includes('Sweden')) {
-                awayP = playersArray.find(p => p.name.includes('GIMÉNEZ')) || playersArray[5];
-              } else {
-                awayP = playersArray[Math.min(1, playersArray.length - 1)] || { name: 'Player B', team: match.away, stats: { shooting: 75, passing: 75, dribbling: 75, physical: 75, defense: 75, speed: 75 }, bio: '' };
-              }
+                awayP = { name: `Figura (${match.away})`, team: match.away, stats: { shooting: 75, passing: 75, dribbling: 75, physical: 75, defense: 75, speed: 75 }, bio: '' };
             }
-            
             return { homeP, awayP };
           };
 
@@ -663,18 +674,30 @@ const App = () => {
                   <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
                     <div className="pes-spinner"></div>
                   </div>
-                ) : matches.length === 0 ? (
-                  <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--text-dim)' }}>
-                    No hay partidos cargados para esta liga.
-                  </div>
-                ) : matches.map(match => {
-                  const { homeP, awayP } = getMatchPlayers(match, players);
-                  const isHomeSelected = currentPlayer.name === homeP.name;
-                  const isAwaySelected = currentPlayer.name === awayP.name;
+                ) : (
+                  (() => {
+                    let displayMatches = matches;
+                    if (league === 'WC') {
+                      const knockoutMatches = WC_KNOCKOUT.flatMap(round => 
+                        round.matches
+                          .filter(m => m.home !== 'TBD' && m.away !== 'TBD')
+                          .map(m => ({ ...m, group_name: round.name, id: m.id || m.home+'-'+m.away }))
+                      );
+                      displayMatches = [...matches, ...knockoutMatches];
+                    }
+                    
+                    return displayMatches.length === 0 ? (
+                      <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--text-dim)' }}>
+                        No hay partidos cargados para esta liga.
+                      </div>
+                    ) : displayMatches.map((match, idx) => {
+                      const { homeP, awayP } = getMatchPlayers(match, players);
+                      const isHomeSelected = currentPlayer?.name === homeP?.name;
+                      const isAwaySelected = currentPlayer?.name === awayP?.name;
 
-                  return (
-                    <motion.div 
-                      key={match.id}
+                      return (
+                        <motion.div 
+                          key={match.id || idx}
                       initial={{ x: -20, opacity: 0 }}
                       animate={{ x: 0, opacity: 1 }}
                       className="match-card"
@@ -807,7 +830,9 @@ const App = () => {
                       </button>
                     </motion.div>
                   );
-                })}
+                });
+                })()
+                )}
               </section>
 
               {/* Right Column: Interactive Radar & Tactical AI Insights */}
