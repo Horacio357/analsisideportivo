@@ -97,7 +97,7 @@ const RadarChart = ({ stats, labels, name, color = '#00ff88', datasets }) => {
   };
 
   return (
-    <div className="radar-container" style={{ width: '100%', height: '300px' }}>
+    <div className="radar-container" style={{ position: 'relative', width: '100%', height: '300px' }}>
       <Radar data={data} options={options} />
     </div>
   );

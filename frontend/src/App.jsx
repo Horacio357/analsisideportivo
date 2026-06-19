@@ -743,6 +743,7 @@ const App = () => {
                             if (idx !== -1) setSelectedPlayer(idx);
                           }}
                           style={{ 
+                            minWidth: 0,
                             background: isHomeSelected ? 'rgba(0,255,136,0.04)' : 'rgba(255,255,255,0.02)', 
                             border: `1px solid ${isHomeSelected ? 'var(--accent-color)' : 'rgba(255,255,255,0.05)'}`,
                             borderRadius: '10px', 
@@ -778,6 +779,7 @@ const App = () => {
                             if (idx !== -1) setSelectedPlayer(idx);
                           }}
                           style={{ 
+                            minWidth: 0,
                             background: isAwaySelected ? 'rgba(0,255,136,0.04)' : 'rgba(255,255,255,0.02)', 
                             border: `1px solid ${isAwaySelected ? 'var(--accent-color)' : 'rgba(255,255,255,0.05)'}`,
                             borderRadius: '10px', 
@@ -836,7 +838,7 @@ const App = () => {
               </section>
 
               {/* Right Column: Interactive Radar & Tactical AI Insights */}
-              <section className="glass-panel" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+              <section className="glass-panel" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', position: 'sticky', top: '20px', height: 'max-content' }}>
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px', justifyContent: 'center' }}>
                     <BrainCircuit color="var(--accent-color)" />
