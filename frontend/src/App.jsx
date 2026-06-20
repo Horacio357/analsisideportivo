@@ -78,23 +78,55 @@ const getTeamLogoPath = (teamName) => {
 
   // World Cup / Nations
   if (name.includes('argentina')) return '/escudos/WC/argentina.png';
-  if (name.includes('jordania')) return '/escudos/WC/arabiasaudita.png';
-  if (name.includes('españa') || name.includes('espana')) return '/escudos/WC/espana.png';
-  if (name.includes('nueva zelanda')) return '/escudos/WC/nuevazelanda.png';
-  if (name.includes('francia')) return '/escudos/WC/francia.png';
-  if (name.includes('uganda')) return '/escudos/WC/senegal.png';
+  if (name.includes('arabia') || name.includes('saudi') || name.includes('jordania')) return '/escudos/WC/arabiasaudita.png';
+  if (name.includes('españa') || name.includes('espana') || name.includes('spain')) return '/escudos/WC/espana.png';
+  if (name.includes('nueva zelanda') || name.includes('new zealand')) return '/escudos/WC/nuevazelanda.png';
+  if (name.includes('francia') || name.includes('france')) return '/escudos/WC/francia.png';
+  if (name.includes('senegal') || name.includes('uganda')) return '/escudos/WC/senegal.png';
   if (name.includes('méxico') || name.includes('mexico')) return '/escudos/WC/mexico.png';
-  if (name.includes('suecia')) return '/escudos/WC/suecia.png';
-  if (name.includes('inglaterra')) return '/escudos/WC/inglaterra.png';
+  if (name.includes('suecia') || name.includes('sweden')) return '/escudos/WC/suecia.png';
+  if (name.includes('inglaterra') || name.includes('england')) return '/escudos/WC/inglaterra.png';
   if (name.includes('ecuador')) return '/escudos/WC/ecuador.png';
-  if (name.includes('brasil')) return '/escudos/WC/brasil.png';
+  if (name.includes('brasil') || name.includes('brazil')) return '/escudos/WC/brasil.png';
   if (name.includes('uruguay')) return '/escudos/WC/uruguay.png';
-  if (name.includes('países bajos') || name.includes('paises bajos') || name.includes('holanda')) return '/escudos/WC/paisesbajos.png';
+  if (name.includes('países bajos') || name.includes('paises bajos') || name.includes('holanda') || name.includes('netherlands')) return '/escudos/WC/paisesbajos.png';
   if (name.includes('colombia')) return '/escudos/WC/colombia.png';
   if (name.includes('portugal')) return '/escudos/WC/portugal.png';
-  if (name.includes('croacia')) return '/escudos/WC/croacia.png';
+  if (name.includes('croacia') || name.includes('croatia')) return '/escudos/WC/croacia.png';
   if (name.includes('ee.uu.') || name.includes('usa') || name.includes('estados unidos')) return '/escudos/WC/usa.png';
-  if (name.includes('marruecos')) return '/escudos/WC/marruecos.png';
+  if (name.includes('marruecos') || name.includes('morocco')) return '/escudos/WC/marruecos.png';
+  if (name.includes('iran') || name.includes('irán')) return '/escudos/WC/iran.png';
+  if (name.includes('iraq') || name.includes('irak')) return '/escudos/WC/iraq.png'; // Might fallback to null if no image, but let's add common
+  if (name.includes('norway') || name.includes('noruega')) return '/escudos/WC/noruega.png';
+  if (name.includes('ghana')) return '/escudos/WC/ghana.png';
+  if (name.includes('panama') || name.includes('panamá')) return '/escudos/WC/panama.png';
+  if (name.includes('czechia') || name.includes('czech') || name.includes('checa')) return '/escudos/WC/republicacheca.png';
+  if (name.includes('south africa') || name.includes('sudafrica') || name.includes('sudáfrica')) return '/escudos/WC/sudafrica.png';
+  if (name.includes('switzerland') || name.includes('suiza')) return '/escudos/WC/suiza.png';
+  if (name.includes('bosnia')) return '/escudos/WC/bosnia.png';
+  if (name.includes('canada') || name.includes('canadá')) return '/escudos/WC/canada.png';
+  if (name.includes('qatar')) return '/escudos/WC/qatar.png';
+  if (name.includes('australia')) return '/escudos/WC/australia.png';
+  if (name.includes('scotland') || name.includes('escocia')) return '/escudos/WC/escocia.png';
+  if (name.includes('turkey') || name.includes('turquia') || name.includes('turquía')) return '/escudos/WC/turquia.png';
+  if (name.includes('paraguay')) return '/escudos/WC/paraguay.png';
+  if (name.includes('germany') || name.includes('alemania')) return '/escudos/WC/alemania.png';
+  if (name.includes('ivory coast') || name.includes('costa de marfil')) return '/escudos/WC/costademarfil.png';
+  if (name.includes('haiti') || name.includes('haití')) return '/escudos/WC/haiti.png';
+  if (name.includes('curaçao') || name.includes('curazao')) return '/escudos/WC/curacao.png';
+  if (name.includes('chile')) return '/escudos/WC/chile.png';
+  if (name.includes('peru') || name.includes('perú')) return '/escudos/WC/peru.png';
+  if (name.includes('venezuela')) return '/escudos/WC/venezuela.png';
+  if (name.includes('bolivia')) return '/escudos/WC/bolivia.png';
+  if (name.includes('wales') || name.includes('gales')) return '/escudos/WC/gales.png';
+  if (name.includes('poland') || name.includes('polonia')) return '/escudos/WC/polonia.png';
+  if (name.includes('denmark') || name.includes('dinamarca')) return '/escudos/WC/dinamarca.png';
+  if (name.includes('japan') || name.includes('japon') || name.includes('japón')) return '/escudos/WC/japon.png';
+  if (name.includes('korea') || name.includes('corea')) return '/escudos/WC/coreadelsur.png';
+  if (name.includes('italy') || name.includes('italia')) return '/escudos/WC/italia.png';
+  if (name.includes('belgium') || name.includes('belgica') || name.includes('bélgica')) return '/escudos/WC/belgica.png';
+  if (name.includes('cameroon') || name.includes('camerun') || name.includes('camerún')) return '/escudos/WC/camerun.png';
+  if (name.includes('nigeria')) return '/escudos/WC/nigeria.png';
   
   return null;
 };
@@ -513,35 +545,49 @@ const App = () => {
                     )}
 
                     <RadarChart datasets={activeData} labels={['Ataque', 'Defensa', 'Posesión', 'Físico', 'Táctica', 'Cantera']} />
-                    {/* Stat cards (shows main selected team stats) */}
+                    {/* Stat cards (shows comparison if multiple teams selected) */}
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginTop: '20px' }}>
                       {[
-                        { label: `Goles a favor (${mainTeam.name})`, value: mainTeam.goals },
-                        { label: 'Goles en contra', value: mainTeam.conceded },
-                        { label: 'Posesión media', value: mainTeam.possession },
-                        { label: 'Victorias', value: mainTeam.wins },
+                        { key: 'goals', label: 'Goles a favor' },
+                        { key: 'conceded', label: 'Goles en contra' },
+                        { key: 'possession', label: 'Posesión media' },
+                        { key: 'wins', label: 'Victorias' },
                       ].map((s, i) => (
-                        <div key={i} style={{ background: 'rgba(255,255,255,0.04)', borderRadius: '10px', padding: '12px', textAlign: 'center', border: `1px solid ${mainTeam.color}22` }}>
-                          <div style={{ fontSize: '1.3rem', fontWeight: 900, fontFamily: 'Orbitron', color: mainTeam.color }}>{s.value}</div>
-                          <div style={{ fontSize: '0.68rem', color: 'var(--text-dim)', marginTop: '3px' }}>{s.label}</div>
+                        <div key={i} style={{ background: 'rgba(255,255,255,0.04)', borderRadius: '10px', padding: '12px', textAlign: 'center', border: `1px solid rgba(255,255,255,0.1)` }}>
+                          <div style={{ fontSize: '0.68rem', color: 'var(--text-dim)', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '1px' }}>{s.label}</div>
+                          <div style={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center', gap: '5px' }}>
+                            {activeData.map(t => (
+                              <div key={t.name} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                <span style={{ fontSize: '1.2rem', fontWeight: 900, fontFamily: 'Orbitron', color: t.color }}>{t[s.key]}</span>
+                                <span style={{ fontSize: '0.55rem', color: 'var(--text-dim)', maxWidth: '50px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.name}</span>
+                              </div>
+                            ))}
+                          </div>
                         </div>
                       ))}
                     </div>
                     {/* Form strip */}
-                    <div style={{ marginTop: '18px' }}>
-                      <div style={{ fontSize: '0.68rem', color: 'var(--text-dim)', letterSpacing: '1px', marginBottom: '8px' }}>ÚLTIMOS 5 PARTIDOS ({mainTeam.name})</div>
-                      <div style={{ display: 'flex', gap: '8px' }}>
-                        {mainTeam.form.split('').map((result, i) => (
-                          <div key={i} style={{
-                            width: '24px', height: '24px', borderRadius: '4px',
-                            background: formColors[result], color: '#fff',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            fontSize: '0.7rem', fontWeight: 700
-                          }}>
-                            {formLabels[result]}
+                    <div style={{ marginTop: '18px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                      {activeData.map(t => (
+                        <div key={t.name}>
+                          <div style={{ fontSize: '0.68rem', color: t.color, letterSpacing: '1px', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 600 }}>
+                            <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: t.color, boxShadow: `0 0 5px ${t.color}` }}></span>
+                            ÚLTIMOS 5 PARTIDOS ({t.name.toUpperCase()})
                           </div>
-                        ))}
-                      </div>
+                          <div style={{ display: 'flex', gap: '8px' }}>
+                            {t.form.split('').map((result, i) => (
+                              <div key={i} style={{
+                                width: '24px', height: '24px', borderRadius: '4px',
+                                background: formColors[result], color: '#fff',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                fontSize: '0.7rem', fontWeight: 700
+                              }}>
+                                {formLabels[result]}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </motion.div>
                 );
