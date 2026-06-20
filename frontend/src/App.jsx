@@ -124,7 +124,8 @@ const App = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`http://localhost:8000/matches?league_id=${league}`);
+        const apiUrl = import.meta.env.VITE_API_URL || 'http://187.127.251.141:8000';
+        const response = await axios.get(`${apiUrl}/matches?league_id=${league}`);
         if (response.data && response.data.status === 'success' && response.data.matches && response.data.matches.length > 0) {
           setMatches(response.data.matches);
         } else {

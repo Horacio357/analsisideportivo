@@ -334,9 +334,10 @@ export const useAppStore = create((set, get) => ({
 
     try {
       // Parallel requests: API calls and a minimum delay of 800ms for loading screen transition
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://187.127.251.141:8000';
       const [matchesRes, teamRes] = await Promise.all([
-        axios.get(`http://localhost:8000/matches`, { params: { league_id: currentLeague } }),
-        axios.get(`http://localhost:8000/team/${currentLeague}`),
+        axios.get(`${apiUrl}/matches`, { params: { league_id: currentLeague } }),
+        axios.get(`${apiUrl}/team/${currentLeague}`),
         new Promise(resolve => setTimeout(resolve, 800))
       ]);
 
