@@ -57,9 +57,10 @@ const SubscriptionModal = ({ isOpen, onClose, t, onVipActivated }) => {
       } else {
         runDemoFlow();
       }
-    } catch {
-      // Token not configured or network issue — run demo flow
-      runDemoFlow();
+    } catch (error) {
+      console.error('Payment Error:', error);
+      setEmailError('Error de conexión (probablemente por bloqueo HTTPS/Mixed Content).');
+      setStep('plan');
     }
   };
 

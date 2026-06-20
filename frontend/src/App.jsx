@@ -555,11 +555,11 @@ const App = () => {
                       ].map((s, i) => (
                         <div key={i} style={{ background: 'rgba(255,255,255,0.04)', borderRadius: '10px', padding: '12px', textAlign: 'center', border: `1px solid rgba(255,255,255,0.1)` }}>
                           <div style={{ fontSize: '0.68rem', color: 'var(--text-dim)', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '1px' }}>{s.label}</div>
-                          <div style={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center', gap: '5px' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center', gap: '5px', flexWrap: 'wrap' }}>
                             {activeData.map(t => (
-                              <div key={t.name} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                                <span style={{ fontSize: '1.2rem', fontWeight: 900, fontFamily: 'Orbitron', color: t.color }}>{t[s.key]}</span>
-                                <span style={{ fontSize: '0.55rem', color: 'var(--text-dim)', maxWidth: '50px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.name}</span>
+                              <div key={t.name} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: '1 1 0', minWidth: '40px' }}>
+                                <span style={{ fontSize: activeData.length >= 3 ? '0.95rem' : '1.2rem', fontWeight: 900, fontFamily: 'Orbitron', color: t.color }}>{t[s.key]}</span>
+                                <span style={{ fontSize: '0.55rem', color: 'var(--text-dim)', maxWidth: '45px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.name}</span>
                               </div>
                             ))}
                           </div>
