@@ -1,9 +1,11 @@
 import requests
 import datetime
 
-NEWS_API_KEY = "2afdb251676a4314b12d7c4b8dd02972"
+import os
+
+NEWS_API_KEY = os.getenv("NEWS_API_KEY", "2afdb251676a4314b12d7c4b8dd02972")
 BASE_URL = "https://newsapi.org/v2/everything"
-NEWSDATA_API_KEY = "pub_f1e62282e11a4b4ebfc2515ca24fa2b7"
+NEWSDATA_API_KEY = os.getenv("NEWSDATA_API_KEY", "pub_f1e62282e11a4b4ebfc2515ca24fa2b7")
 NEWSDATA_URL = "https://newsdata.io/api/1/latest"
 
 def get_recent_news(query: str, max_results: int = 3):
