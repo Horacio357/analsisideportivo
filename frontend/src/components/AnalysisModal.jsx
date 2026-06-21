@@ -18,14 +18,11 @@ const AnalysisModal = ({ isOpen, onClose, match, t, onOpenGlossary, getTeamLogoP
   };
 
   const isAlta = match.confidence === 'ALTA';
-  const isMedia = match.confidence === 'MEDIA';
-  const isValue = match.confidence === 'VALUE BET';
-
-  // Mock News Data (Fallback)
+  // Mock News Data (Fallback para 2026)
   const mockNews = [
-    { id: 1, source: 'Diario Olé', title: `Alerta en ${match.home}: Dudas en el mediocampo por molestia muscular.`, time: 'Hace 2 horas' },
-    { id: 2, source: 'ESPN', title: `El técnico de ${match.away} confirma el once titular con sorpresa en ataque.`, time: 'Hace 5 horas' },
-    { id: 3, source: 'TyC Sports', title: `Historial parejo: ¿Quién domina en los últimos 5 enfrentamientos?`, time: 'Ayer' }
+    { id: 1, source: 'Diario Olé', title: `Mundial 2026: Alerta en ${match.home}, dudas en el once titular para el debut.`, time: 'Hace 2 horas' },
+    { id: 2, source: 'ESPN', title: `Rumbo a 2026: El técnico de ${match.away} confirma el planteo táctico definitivo.`, time: 'Hace 5 horas' },
+    { id: 3, source: 'TyC Sports', title: `Proyección 2026: Análisis del xG y estadísticas de cara al enfrentamiento.`, time: 'Ayer' }
   ];
 
   const [newsData, setNewsData] = React.useState([
@@ -34,11 +31,14 @@ const AnalysisModal = ({ isOpen, onClose, match, t, onOpenGlossary, getTeamLogoP
 
   React.useEffect(() => {
     if (match) {
-      // Usar la ruta dinámica, asumiendo que el backend corre en el mismo host o en el puerto 8000 si es local
-      const baseUrl = window.location.hostname === 'localhost' ? 'http://localhost:8000' : 'https://apuestasweb-backend.onrender.com';
-      fetch(`${baseUrl}/api/news?team1=${encodeURIComponent(match.home)}&team2=${encodeURIComponent(match.away)}`)
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://187.127.251.141:8000';
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 2500);
+
+      fetch(`${apiUrl}/api/news?team1=${encodeURIComponent(match.home)}&team2=${encodeURIComponent(match.away)}`, { signal: controller.signal })
         .then(res => res.json())
         .then(data => {
+          clearTimeout(timeoutId);
           if (data.status === 'success' && data.news && data.news.length > 0) {
             setNewsData(data.news);
           } else {
@@ -46,7 +46,8 @@ const AnalysisModal = ({ isOpen, onClose, match, t, onOpenGlossary, getTeamLogoP
           }
         })
         .catch(err => {
-          console.error("Error fetching news:", err);
+          clearTimeout(timeoutId);
+          console.warn("Error fetching real news, using 2026 fallback:", err);
           setNewsData(mockNews);
         });
     }
