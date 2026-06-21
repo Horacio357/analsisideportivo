@@ -21,12 +21,36 @@ const AnalysisModal = ({ isOpen, onClose, match, t, onOpenGlossary, getTeamLogoP
   const isMedia = match.confidence === 'MEDIA';
   const isValue = match.confidence === 'VALUE BET';
 
-  // Mock News Data
+  // Mock News Data (Fallback)
   const mockNews = [
     { id: 1, source: 'Diario Olé', title: `Alerta en ${match.home}: Dudas en el mediocampo por molestia muscular.`, time: 'Hace 2 horas' },
     { id: 2, source: 'ESPN', title: `El técnico de ${match.away} confirma el once titular con sorpresa en ataque.`, time: 'Hace 5 horas' },
     { id: 3, source: 'TyC Sports', title: `Historial parejo: ¿Quién domina en los últimos 5 enfrentamientos?`, time: 'Ayer' }
   ];
+
+  const [newsData, setNewsData] = React.useState([
+    { id: 1, source: 'Sistema', title: 'Cargando noticias...', time: '' }
+  ]);
+
+  React.useEffect(() => {
+    if (match) {
+      // Usar la ruta dinámica, asumiendo que el backend corre en el mismo host o en el puerto 8000 si es local
+      const baseUrl = window.location.hostname === 'localhost' ? 'http://localhost:8000' : 'https://apuestasweb-backend.onrender.com';
+      fetch(`${baseUrl}/api/news?team1=${encodeURIComponent(match.home)}&team2=${encodeURIComponent(match.away)}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.status === 'success' && data.news && data.news.length > 0) {
+            setNewsData(data.news);
+          } else {
+            setNewsData(mockNews);
+          }
+        })
+        .catch(err => {
+          console.error("Error fetching news:", err);
+          setNewsData(mockNews);
+        });
+    }
+  }, [match]);
 
   // Mock Value Bet Data
   const bookmakerOdds = (match.homeProb > match.awayProb) ? 1.95 : 2.80; 
@@ -173,7 +197,7 @@ const AnalysisModal = ({ isOpen, onClose, match, t, onOpenGlossary, getTeamLogoP
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            {mockNews.map((news) => (
+            {newsData.map((news) => (
               <div key={news.id} style={{ background: 'rgba(0,0,0,0.3)', padding: '12px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
                   <span style={{ fontSize: '0.65rem', color: '#00c6ff', fontWeight: 'bold' }}>{news.source}</span>

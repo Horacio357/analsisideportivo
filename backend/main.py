@@ -9,6 +9,7 @@ import uvicorn
 import os
 import mercadopago
 from dotenv import load_dotenv
+from services.news_service import get_recent_news
 
 load_dotenv()
 
@@ -190,6 +191,12 @@ async def get_matches(league_id: str, db: Session = Depends(get_db)):
             **bet_data
         })
     return {"status": "success", "league": league_id, "matches": result}
+
+@app.get("/api/news")
+async def fetch_news(team1: str, team2: str):
+    query = f'"{team1}" OR "{team2}"'
+    news = get_recent_news(query, max_results=3)
+    return {"status": "success", "news": news}
 
 @app.get("/team/{league_id}")
 async def get_team(league_id: str, db: Session = Depends(get_db)):
