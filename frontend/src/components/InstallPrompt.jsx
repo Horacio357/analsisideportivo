@@ -28,6 +28,9 @@ const InstallPrompt = () => {
 
     if (isIos() && !isInStandaloneMode()) {
         setTimeout(() => setShowPrompt(true), 3000);
+    } else if (window.location.hostname === 'localhost') {
+        // Forzar aparición en local para pruebas de UI (el evento PWA a veces no dispara en Vite dev)
+        setTimeout(() => setShowPrompt(true), 3000);
     }
 
     return () => {
@@ -45,7 +48,7 @@ const InstallPrompt = () => {
       setDeferredPrompt(null);
     } else {
         // iOS or fallback instructions
-        alert('Para instalar en iPhone/iPad: toca el ícono "Compartir" (cuadrado con flecha hacia arriba) en la barra inferior de Safari y luego selecciona "Agregar a Inicio".');
+        alert('Para instalar la App:\n- En iPhone: toca el ícono "Compartir" en Safari y luego "Agregar a Inicio".\n- En PC/Android: Busca el ícono de instalación en la barra superior o en el menú de Chrome.');
         setShowPrompt(false);
     }
   };
