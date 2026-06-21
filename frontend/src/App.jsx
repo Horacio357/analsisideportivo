@@ -10,6 +10,7 @@ import SubscriptionModal from './components/SubscriptionModal';
 import EffectivenessGauge from './components/EffectivenessGauge';
 import Corazonadas from './components/Corazonadas';
 import Fixture from './components/Fixture';
+import InstallPrompt from './components/InstallPrompt';
 import { translations } from './utils/translations';
 import { getPlayersData, allMatchesFallback, fillFallbackBettingDetails, WC_KNOCKOUT } from './store/useAppStore';
 import { triggerCelebration } from './utils/effects';
@@ -1055,6 +1056,8 @@ const App = () => {
           setVipEmail(email);
         }}
       />
+      
+      <InstallPrompt />
     </motion.div>
   );
 };
