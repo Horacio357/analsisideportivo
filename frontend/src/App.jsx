@@ -144,9 +144,20 @@ const App = () => {
   const [selectedMatch, setSelectedMatch] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isVipModalOpen, setIsVipModalOpen] = useState(false);
-  const [isVip, setIsVip] = useState(false);
+  const [isVip, setIsVip] = useState(localStorage.getItem('xguru_vip') === 'true');
   const [vipEmail, setVipEmail] = useState('');
   const [analysisMode, setAnalysisMode] = useState('team'); // 'team' | 'player'
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const status = params.get('status');
+    if (status === 'approved' || status === 'success') {
+      setIsVip(true);
+      localStorage.setItem('xguru_vip', 'true');
+      triggerCelebration();
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, []);
   const [selectedTeams, setSelectedTeams] = useState([]); // array of team names for comparison
 
   const t = translations[lang];
@@ -1053,6 +1064,7 @@ const App = () => {
         onVipActivated={(email) => {
           triggerCelebration();
           setIsVip(true);
+          localStorage.setItem('xguru_vip', 'true');
           setVipEmail(email);
         }}
       />
