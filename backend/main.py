@@ -9,11 +9,24 @@ import uvicorn
 import os
 import mercadopago
 from dotenv import load_dotenv
+from apscheduler.schedulers.background import BackgroundScheduler
+from contextlib import asynccontextmanager
 from services.news_service import get_recent_news
+from services.football_service import fetch_and_update_matches
 
 load_dotenv()
 
-app = FastAPI(title="Football Betting AI API")
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    scheduler = BackgroundScheduler()
+    # Run everyday at midnight
+    scheduler.add_job(fetch_and_update_matches, 'cron', hour=0, minute=0)
+    scheduler.start()
+    print("[INFO] Background scheduler started")
+    yield
+    scheduler.shutdown()
+
+app = FastAPI(title="Football Betting AI API", lifespan=lifespan)
 
 # Mercado Pago SDK (use your real TEST token in .env)
 MP_TOKEN = os.getenv("MP_ACCESS_TOKEN", "TEST-0000000000000000-000000-00000000000000000000000000000000-000000000")
@@ -197,6 +210,14 @@ async def fetch_news(team1: str, team2: str):
     query = f'"{team1}" OR "{team2}"'
     news = get_recent_news(query, max_results=3)
     return {"status": "success", "news": news}
+
+@app.post("/force_sync")
+async def force_sync():
+    """Endpoint to manually trigger the football API sync for testing"""
+    import threading
+    # Run in background to avoid blocking the API request
+    threading.Thread(target=fetch_and_update_matches).start()
+    return {"status": "success", "message": "Football data synchronization started in background"}
 
 @app.get("/team/{league_id}")
 async def get_team(league_id: str, db: Session = Depends(get_db)):
