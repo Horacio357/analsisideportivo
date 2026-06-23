@@ -411,7 +411,6 @@ const App = () => {
                       className="pes-button" 
                       style={{ width: '100%', marginTop: '10px', padding: '8px', fontSize: '0.8rem' }}
                       onClick={() => {
-                        triggerCelebration();
                         setSelectedMatch(match);
                         setIsModalOpen(true);
                       }}

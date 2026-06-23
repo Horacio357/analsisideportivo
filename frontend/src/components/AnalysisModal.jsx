@@ -18,6 +18,7 @@ const AnalysisModal = ({ isOpen, onClose, match, t, onOpenGlossary, getTeamLogoP
   };
 
   const isAlta = match.confidence === 'ALTA';
+  const isMedia = match.confidence === 'MEDIA';
   // Mock News Data (Fallback para 2026)
   const mockNews = [
     { id: 1, source: 'Diario Olé', title: `Mundial 2026: Alerta en ${match.home}, dudas en el once titular para el debut.`, time: 'Hace 2 horas' },
