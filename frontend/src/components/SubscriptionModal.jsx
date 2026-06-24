@@ -22,17 +22,34 @@ const PLANS = [
 ];
 
 const SubscriptionModal = ({ isOpen, onClose, t, onVipActivated }) => {
-  const [step, setStep] = useState('plan'); // 'plan' | 'loading' | 'success' | 'wallet'
+  const [step, setStep] = useState('plan'); // 'plan' | 'loading'
   const [email, setEmail] = useState('');
-  const [preferenceId, setPreferenceId] = useState(null);
   const [emailError, setEmailError] = useState('');
   const [selectedPlan, setSelectedPlan] = useState(PLANS[0]);
+  
+  const [dynamicBenefits, setDynamicBenefits] = useState(BENEFITS);
+  const [paymentLink, setPaymentLink] = useState('');
+
+  React.useEffect(() => {
+    if (isOpen) {
+      setStep('plan');
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://187.127.251.141:8000';
+      axios.get(`${apiUrl}/admin/settings`).then(res => {
+        if (res.data.vip_benefits) {
+          setDynamicBenefits(res.data.vip_benefits.split(',').map(b => b.trim()));
+        }
+        if (res.data.vip_payment_link) {
+          setPaymentLink(res.data.vip_payment_link);
+        }
+      }).catch(err => console.warn('Usando beneficios por defecto'));
+    }
+  }, [isOpen]);
 
   const validateEmail = (val) => val && val.includes('@') && val.includes('.');
 
   const handlePayment = async () => {
     if (!validateEmail(email)) {
-      setEmailError('Ingresá un email válido.');
+      setEmailError('Ingresá un email válido para enviarte el comprobante.');
       return;
     }
     setEmailError('');
@@ -40,43 +57,30 @@ const SubscriptionModal = ({ isOpen, onClose, t, onVipActivated }) => {
 
     try {
       const apiUrl = import.meta.env.VITE_API_URL || 'http://187.127.251.141:8000';
-      const response = await axios.post(`${apiUrl}/create_preference`, {
-        title: `Suscripción BET AI VIP - ${selectedPlan.name}`,
-        quantity: 1,
-        unit_price: selectedPlan.price,
-        payer_email: email,
-        plan_id: selectedPlan.id
-      });
+      
+      // Tracking
+      await axios.post(`${apiUrl}/analytics/premium_click`).catch(() => {});
+      
+      // Enviar mail de bienvenida simulado para mantener la BD
+      await axios.post(`${apiUrl}/send_welcome_email`, { email, plan_id: selectedPlan.id }).catch(() => {});
 
-      // Real MP token configured — render Wallet brick
-      if (response.data?.id) {
-        setPreferenceId(response.data.id);
-        setStep('wallet');
-      } else if (response.data?.init_point) {
-        window.location.href = response.data.init_point;
+      // Redirigir al link de pago dinámico
+      if (paymentLink) {
+        window.location.href = paymentLink;
       } else {
-        runDemoFlow();
+        alert("El link de pago no está configurado. Ve al Panel Admin.");
+        setStep('plan');
       }
     } catch (error) {
-      console.error('Payment Error:', error);
-      setEmailError('Error de conexión (probablemente por bloqueo HTTPS/Mixed Content).');
+      console.error(error);
       setStep('plan');
     }
-  };
-
-  const runDemoFlow = () => {
-    // Simulate payment processing (2s) then show success
-    setTimeout(() => {
-      setStep('success');
-      if (onVipActivated) onVipActivated(email);
-    }, 2000);
   };
 
   const handleClose = () => {
     setStep('plan');
     setEmail('');
     setEmailError('');
-    setPreferenceId(null);
     onClose();
   };
 
@@ -141,14 +145,16 @@ const SubscriptionModal = ({ isOpen, onClose, t, onVipActivated }) => {
               </div>
             </div>
 
-            {/* Benefits */}
-            <div style={{ background: 'rgba(255,255,255,0.03)', borderRadius: '12px', padding: '16px 20px', marginBottom: '20px', border: '1px solid rgba(255,255,255,0.06)' }}>
-              {BENEFITS.map((b, i) => (
-                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: i < BENEFITS.length - 1 ? '10px' : 0, fontSize: '0.88rem' }}>
-                  <CheckCircle size={15} color="var(--accent-color)" style={{ flexShrink: 0 }} />
-                  {b}
-                </div>
-              ))}
+            {/* Beneficios - Dinámicos */}
+            <div style={{ background: 'rgba(0,0,0,0.4)', borderRadius: '12px', padding: '15px', marginBottom: '20px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                {dynamicBenefits.map((benefit, i) => (
+                  <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
+                    <CheckCircle size={14} color="var(--accent-color)" style={{ marginTop: '2px', flexShrink: 0 }} />
+                    <span style={{ color: 'var(--text-dim)', fontSize: '0.8rem', lineHeight: '1.2' }}>{benefit}</span>
+                  </div>
+                ))}
+              </div>
             </div>
 
             {/* Email */}

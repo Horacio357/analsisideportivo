@@ -71,3 +71,14 @@ class Match(Base):
     home_team = relationship("Team", foreign_keys=[home_team_id])
     away_team = relationship("Team", foreign_keys=[away_team_id])
 
+class Setting(Base):
+    __tablename__ = "settings"
+    key = Column(String, primary_key=True, index=True)
+    value = Column(String)
+
+class Analytics(Base):
+    __tablename__ = "analytics"
+    id = Column(Integer, primary_key=True, index=True)
+    date = Column(String, index=True, unique=True) # e.g. "2026-06-23"
+    visits = Column(Integer, default=0)
+    premium_clicks = Column(Integer, default=0)

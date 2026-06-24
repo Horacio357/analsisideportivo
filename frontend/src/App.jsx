@@ -11,6 +11,7 @@ import EffectivenessGauge from './components/EffectivenessGauge';
 import Corazonadas from './components/Corazonadas';
 import Fixture from './components/Fixture';
 import InstallPrompt from './components/InstallPrompt';
+import AdminDashboard from './components/AdminDashboard';
 import { translations } from './utils/translations';
 import { getPlayersData, allMatchesFallback, fillFallbackBettingDetails, WC_KNOCKOUT } from './store/useAppStore';
 import { triggerCelebration } from './utils/effects';
@@ -157,6 +158,10 @@ const App = () => {
       triggerCelebration();
       window.history.replaceState({}, document.title, window.location.pathname);
     }
+
+    // Registrar visita silenciosa
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://187.127.251.141:8000';
+    axios.post(`${apiUrl}/analytics/visit`).catch(() => {});
   }, []);
   const [selectedTeams, setSelectedTeams] = useState([]); // array of team names for comparison
 
@@ -196,6 +201,14 @@ const App = () => {
     return <LandingPage onEnter={() => setView('dashboard')} t={t} />;
   }
 
+  if (view === 'admin') {
+    return (
+      <div className={`theme-${theme}`} style={{ minHeight: '100vh', backgroundColor: 'var(--bg-color)' }}>
+        <AdminDashboard onLogout={() => setView('landing')} />
+      </div>
+    );
+  }
+
   return (
     <motion.div 
       initial="hidden"
@@ -222,7 +235,7 @@ const App = () => {
         variants={{ hidden: { y: -50, opacity: 0 }, visible: { y: 0, opacity: 1, transition: { type: 'spring', stiffness: 100 } } }}
         className="glass-panel" style={{ margin: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '15px' }}
       >
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer' }} onClick={() => setView('admin')}>
           <h1 className="heading-font" style={{ color: 'var(--accent-color)', fontSize: '1.5rem', margin: 0, lineHeight: 1.2 }}>
             XGuru
           </h1>

@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Optional
 from sqlalchemy.orm import Session
+from datetime import date
 from database import get_db, engine, Base
 import models
 import uvicorn
@@ -319,6 +320,58 @@ async def send_welcome_email(item: dict):
     # Aquí iría el código real de smtplib o SendGrid cuando el usuario agregue credenciales
     
     return {"status": "success", "message": "Welcome email sent (simulated)"}
+
+class SettingUpdate(BaseModel):
+    key: str
+    value: str
+
+@app.get("/admin/settings")
+async def get_settings(db: Session = Depends(get_db)):
+    settings = db.query(models.Setting).all()
+    result = {s.key: s.value for s in settings}
+    if not result:
+        result = {
+            "vip_payment_link": "https://link.mercadopago.com.ar/tu_link_aqui",
+            "vip_benefits": "Predicciones VIP,Top 3 MVP,Estadísticas Radar,Soporte Prioritario"
+        }
+    return result
+
+@app.post("/admin/settings")
+async def update_settings(updates: List[SettingUpdate], password: str = "", db: Session = Depends(get_db)):
+    if password != "xguru_admin_123":
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    
+    for update in updates:
+        setting = db.query(models.Setting).filter(models.Setting.key == update.key).first()
+        if setting:
+            setting.value = update.value
+        else:
+            db.add(models.Setting(key=update.key, value=update.value))
+    db.commit()
+    return {"status": "success"}
+
+@app.post("/analytics/{event_type}")
+async def track_event(event_type: str, db: Session = Depends(get_db)):
+    today = str(date.today())
+    record = db.query(models.Analytics).filter(models.Analytics.date == today).first()
+    if not record:
+        record = models.Analytics(date=today, visits=0, premium_clicks=0)
+        db.add(record)
+    
+    if event_type == "visit":
+        record.visits += 1
+    elif event_type == "premium_click":
+        record.premium_clicks += 1
+        
+    db.commit()
+    return {"status": "success"}
+
+@app.get("/admin/analytics")
+async def get_analytics(password: str = "", db: Session = Depends(get_db)):
+    if password != "xguru_admin_123":
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    records = db.query(models.Analytics).order_by(models.Analytics.id.desc()).limit(30).all()
+    return records
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

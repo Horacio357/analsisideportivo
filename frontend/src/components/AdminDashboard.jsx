@@ -1,0 +1,178 @@
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { motion } from 'framer-motion';
+import { Lock, Settings, BarChart2, Save, LogOut } from 'lucide-react';
+
+const AdminDashboard = ({ onLogout }) => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [password, setPassword] = useState('');
+  const [activeTab, setActiveTab] = useState('settings');
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState('');
+  
+  const [settings, setSettings] = useState({
+    vip_payment_link: '',
+    vip_benefits: ''
+  });
+  
+  const [analytics, setAnalytics] = useState([]);
+
+  const apiUrl = import.meta.env.VITE_API_URL || 'http://187.127.251.141:8000';
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const res = await axios.get(`${apiUrl}/admin/analytics?password=${password}`);
+      setAnalytics(res.data);
+      setIsAuthenticated(true);
+      fetchSettings();
+    } catch (err) {
+      setMessage('Contraseña incorrecta');
+    }
+    setLoading(false);
+  };
+
+  const fetchSettings = async () => {
+    try {
+      const res = await axios.get(`${apiUrl}/admin/settings`);
+      setSettings({
+        vip_payment_link: res.data.vip_payment_link || '',
+        vip_benefits: res.data.vip_benefits || ''
+      });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const saveSettings = async () => {
+    setLoading(true);
+    try {
+      const updates = [
+        { key: 'vip_payment_link', value: settings.vip_payment_link },
+        { key: 'vip_benefits', value: settings.vip_benefits }
+      ];
+      await axios.post(`${apiUrl}/admin/settings?password=${password}`, updates);
+      setMessage('Configuración guardada correctamente');
+      setTimeout(() => setMessage(''), 3000);
+    } catch (err) {
+      setMessage('Error al guardar');
+    }
+    setLoading(false);
+  };
+
+  if (!isAuthenticated) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '80vh' }}>
+        <motion.div 
+          initial={{ scale: 0.9, opacity: 0 }} 
+          animate={{ scale: 1, opacity: 1 }}
+          style={{ background: 'var(--panel-bg)', padding: '30px', borderRadius: '12px', border: '1px solid var(--accent-color)', width: '90%', maxWidth: '400px', textAlign: 'center' }}
+        >
+          <Lock size={40} color="var(--accent-color)" style={{ marginBottom: '15px' }} />
+          <h2 className="heading-font" style={{ color: '#fff', marginBottom: '20px' }}>Acceso Admin</h2>
+          <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+            <input 
+              type="password" 
+              placeholder="Contraseña" 
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              style={{ padding: '12px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(0,0,0,0.5)', color: '#fff', outline: 'none' }}
+            />
+            <button type="submit" disabled={loading} className="pes-button" style={{ padding: '12px', fontSize: '1rem' }}>
+              {loading ? 'Verificando...' : 'Ingresar'}
+            </button>
+          </form>
+          {message && <p style={{ color: '#ff4444', marginTop: '15px', fontSize: '0.9rem' }}>{message}</p>}
+        </motion.div>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ padding: '20px', maxWidth: '800px', margin: '0 auto', color: '#fff' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+        <h2 className="heading-font" style={{ color: 'var(--accent-color)', margin: 0 }}>Panel de Administración</h2>
+        <button onClick={onLogout} style={{ background: 'none', border: 'none', color: 'var(--text-dim)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px' }}>
+          <LogOut size={16} /> Salir
+        </button>
+      </div>
+
+      <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
+        <button 
+          onClick={() => setActiveTab('settings')}
+          style={{ flex: 1, padding: '10px', background: activeTab === 'settings' ? 'var(--accent-color)' : 'rgba(0,0,0,0.5)', color: activeTab === 'settings' ? '#000' : '#fff', border: '1px solid var(--accent-color)', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}
+        >
+          <Settings size={18} /> Configuración
+        </button>
+        <button 
+          onClick={() => setActiveTab('analytics')}
+          style={{ flex: 1, padding: '10px', background: activeTab === 'analytics' ? 'var(--accent-color)' : 'rgba(0,0,0,0.5)', color: activeTab === 'analytics' ? '#000' : '#fff', border: '1px solid var(--accent-color)', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}
+        >
+          <BarChart2 size={18} /> Métricas
+        </button>
+      </div>
+
+      {message && (
+        <div style={{ background: 'rgba(0,255,136,0.1)', border: '1px solid var(--accent-color)', padding: '10px', borderRadius: '8px', marginBottom: '20px', textAlign: 'center', color: 'var(--accent-color)' }}>
+          {message}
+        </div>
+      )}
+
+      {activeTab === 'settings' && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ background: 'var(--panel-bg)', padding: '20px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
+          <div style={{ marginBottom: '20px' }}>
+            <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text-dim)', fontSize: '0.9rem' }}>Link de Pago VIP (Mercado Pago)</label>
+            <input 
+              type="text" 
+              value={settings.vip_payment_link}
+              onChange={(e) => setSettings({...settings, vip_payment_link: e.target.value})}
+              placeholder="https://link.mercadopago.com.ar/..."
+              style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(0,0,0,0.3)', color: '#fff', boxSizing: 'border-box' }}
+            />
+          </div>
+          <div style={{ marginBottom: '20px' }}>
+            <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text-dim)', fontSize: '0.9rem' }}>Beneficios del Plan VIP (Separados por comas)</label>
+            <textarea 
+              value={settings.vip_benefits}
+              onChange={(e) => setSettings({...settings, vip_benefits: e.target.value})}
+              rows={4}
+              placeholder="Predicciones VIP, Top 3 MVP, Soporte Prioritario"
+              style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(0,0,0,0.3)', color: '#fff', boxSizing: 'border-box', fontFamily: 'inherit' }}
+            />
+          </div>
+          <button onClick={saveSettings} disabled={loading} className="pes-button" style={{ width: '100%', padding: '12px', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}>
+            <Save size={18} /> {loading ? 'Guardando...' : 'Guardar Cambios'}
+          </button>
+        </motion.div>
+      )}
+
+      {activeTab === 'analytics' && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+          {analytics.map((record) => (
+            <div key={record.id} style={{ background: 'var(--panel-bg)', padding: '15px 20px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <span style={{ color: 'var(--accent-color)', fontWeight: 'bold', fontSize: '1.1rem' }}>{record.date}</span>
+              </div>
+              <div style={{ display: 'flex', gap: '20px', textAlign: 'center' }}>
+                <div>
+                  <div style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>{record.visits}</div>
+                  <div style={{ fontSize: '0.7rem', color: 'var(--text-dim)', textTransform: 'uppercase' }}>Visitas</div>
+                </div>
+                <div>
+                  <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#ffb700' }}>{record.premium_clicks}</div>
+                  <div style={{ fontSize: '0.7rem', color: 'var(--text-dim)', textTransform: 'uppercase' }}>Clicks Premium</div>
+                </div>
+              </div>
+            </div>
+          ))}
+          {analytics.length === 0 && (
+            <p style={{ textAlign: 'center', color: 'var(--text-dim)' }}>No hay datos registrados aún.</p>
+          )}
+        </motion.div>
+      )}
+    </div>
+  );
+};
+
+export default AdminDashboard;
