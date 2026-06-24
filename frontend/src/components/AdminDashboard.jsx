@@ -11,7 +11,10 @@ const AdminDashboard = ({ onLogout }) => {
   const [message, setMessage] = useState('');
   
   const [settings, setSettings] = useState({
-    vip_payment_link: '',
+    vip_payment_link_mensual: '',
+    vip_payment_link_trimestral: '',
+    vip_payment_link_semestral: '',
+    vip_payment_link_anual: '',
     vip_benefits: ''
   });
   
@@ -37,7 +40,10 @@ const AdminDashboard = ({ onLogout }) => {
     try {
       const res = await axios.get(`${apiUrl}/admin/settings`);
       setSettings({
-        vip_payment_link: res.data.vip_payment_link || '',
+        vip_payment_link_mensual: res.data.vip_payment_link_mensual || '',
+        vip_payment_link_trimestral: res.data.vip_payment_link_trimestral || '',
+        vip_payment_link_semestral: res.data.vip_payment_link_semestral || '',
+        vip_payment_link_anual: res.data.vip_payment_link_anual || '',
         vip_benefits: res.data.vip_benefits || ''
       });
     } catch (err) {
@@ -49,7 +55,10 @@ const AdminDashboard = ({ onLogout }) => {
     setLoading(true);
     try {
       const updates = [
-        { key: 'vip_payment_link', value: settings.vip_payment_link },
+        { key: 'vip_payment_link_mensual', value: settings.vip_payment_link_mensual },
+        { key: 'vip_payment_link_trimestral', value: settings.vip_payment_link_trimestral },
+        { key: 'vip_payment_link_semestral', value: settings.vip_payment_link_semestral },
+        { key: 'vip_payment_link_anual', value: settings.vip_payment_link_anual },
         { key: 'vip_benefits', value: settings.vip_benefits }
       ];
       await axios.post(`${apiUrl}/admin/settings?password=${password}`, updates);
@@ -121,14 +130,44 @@ const AdminDashboard = ({ onLogout }) => {
 
       {activeTab === 'settings' && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ background: 'var(--panel-bg)', padding: '20px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
-          <div style={{ marginBottom: '20px' }}>
-            <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text-dim)', fontSize: '0.9rem' }}>Link de Pago VIP (Mercado Pago)</label>
+          <div style={{ marginBottom: '15px' }}>
+            <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text-dim)', fontSize: '0.9rem' }}>Link de Pago VIP - MENSUAL</label>
             <input 
               type="text" 
-              value={settings.vip_payment_link}
-              onChange={(e) => setSettings({...settings, vip_payment_link: e.target.value})}
+              value={settings.vip_payment_link_mensual}
+              onChange={(e) => setSettings({...settings, vip_payment_link_mensual: e.target.value})}
               placeholder="https://link.mercadopago.com.ar/..."
-              style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(0,0,0,0.3)', color: '#fff', boxSizing: 'border-box' }}
+              style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(0,0,0,0.3)', color: '#fff', boxSizing: 'border-box' }}
+            />
+          </div>
+          <div style={{ marginBottom: '15px' }}>
+            <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text-dim)', fontSize: '0.9rem' }}>Link de Pago VIP - TRIMESTRAL</label>
+            <input 
+              type="text" 
+              value={settings.vip_payment_link_trimestral}
+              onChange={(e) => setSettings({...settings, vip_payment_link_trimestral: e.target.value})}
+              placeholder="https://link.mercadopago.com.ar/..."
+              style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(0,0,0,0.3)', color: '#fff', boxSizing: 'border-box' }}
+            />
+          </div>
+          <div style={{ marginBottom: '15px' }}>
+            <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text-dim)', fontSize: '0.9rem' }}>Link de Pago VIP - SEMESTRAL</label>
+            <input 
+              type="text" 
+              value={settings.vip_payment_link_semestral}
+              onChange={(e) => setSettings({...settings, vip_payment_link_semestral: e.target.value})}
+              placeholder="https://link.mercadopago.com.ar/..."
+              style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(0,0,0,0.3)', color: '#fff', boxSizing: 'border-box' }}
+            />
+          </div>
+          <div style={{ marginBottom: '20px' }}>
+            <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text-dim)', fontSize: '0.9rem' }}>Link de Pago VIP - ANUAL</label>
+            <input 
+              type="text" 
+              value={settings.vip_payment_link_anual}
+              onChange={(e) => setSettings({...settings, vip_payment_link_anual: e.target.value})}
+              placeholder="https://link.mercadopago.com.ar/..."
+              style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(0,0,0,0.3)', color: '#fff', boxSizing: 'border-box' }}
             />
           </div>
           <div style={{ marginBottom: '20px' }}>

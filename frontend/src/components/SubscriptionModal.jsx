@@ -28,7 +28,12 @@ const SubscriptionModal = ({ isOpen, onClose, t, onVipActivated }) => {
   const [selectedPlan, setSelectedPlan] = useState(PLANS[0]);
   
   const [dynamicBenefits, setDynamicBenefits] = useState(BENEFITS);
-  const [paymentLink, setPaymentLink] = useState('');
+  const [paymentLinks, setPaymentLinks] = useState({
+    mensual: '',
+    trimestral: '',
+    semestral: '',
+    anual: ''
+  });
 
   React.useEffect(() => {
     if (isOpen) {
@@ -38,9 +43,12 @@ const SubscriptionModal = ({ isOpen, onClose, t, onVipActivated }) => {
         if (res.data.vip_benefits) {
           setDynamicBenefits(res.data.vip_benefits.split(',').map(b => b.trim()));
         }
-        if (res.data.vip_payment_link) {
-          setPaymentLink(res.data.vip_payment_link);
-        }
+        setPaymentLinks({
+          mensual: res.data.vip_payment_link_mensual || '',
+          trimestral: res.data.vip_payment_link_trimestral || '',
+          semestral: res.data.vip_payment_link_semestral || '',
+          anual: res.data.vip_payment_link_anual || ''
+        });
       }).catch(err => console.warn('Usando beneficios por defecto'));
     }
   }, [isOpen]);
@@ -64,11 +72,12 @@ const SubscriptionModal = ({ isOpen, onClose, t, onVipActivated }) => {
       // Enviar mail de bienvenida simulado para mantener la BD
       await axios.post(`${apiUrl}/send_welcome_email`, { email, plan_id: selectedPlan.id }).catch(() => {});
 
-      // Redirigir al link de pago dinámico
-      if (paymentLink) {
-        window.location.href = paymentLink;
+      // Redirigir al link de pago dinámico según el plan
+      const link = paymentLinks[selectedPlan.id];
+      if (link) {
+        window.location.href = link;
       } else {
-        alert("El link de pago no está configurado. Ve al Panel Admin.");
+        alert("El link de pago para este plan no está configurado. Ve al Panel Admin.");
         setStep('plan');
       }
     } catch (error) {
