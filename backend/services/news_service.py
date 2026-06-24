@@ -8,14 +8,15 @@ BASE_URL = "https://newsapi.org/v2/everything"
 NEWSDATA_API_KEY = os.getenv("NEWSDATA_API_KEY", "pub_f1e62282e11a4b4ebfc2515ca24fa2b7")
 NEWSDATA_URL = "https://newsdata.io/api/1/latest"
 
-def get_recent_news(query: str, max_results: int = 3):
+def get_recent_news(query: str, max_results: int = 3, news_api_key: str = None, newsdata_api_key: str = None):
     current_year = "2026"
+    active_news_key = news_api_key or NEWS_API_KEY
     
     params = {
         "q": f"({query}) AND {current_year}",
         "language": "es",
         "sortBy": "publishedAt",
-        "apiKey": NEWS_API_KEY,
+        "apiKey": active_news_key,
         "pageSize": max_results
     }
     
@@ -40,25 +41,26 @@ def get_recent_news(query: str, max_results: int = 3):
                 })
             
             if not results:
-                return get_newsdata_fallback(query, max_results)
+                return get_newsdata_fallback(query, max_results, newsdata_api_key)
                 
             return results
         else:
             print(f"Error fetching news: {response.status_code} - {response.text}")
-            return get_newsdata_fallback(query, max_results)
+            return get_newsdata_fallback(query, max_results, newsdata_api_key)
     except Exception as e:
         print(f"Request failed: {e}")
-        return get_newsdata_fallback(query, max_results)
+        return get_newsdata_fallback(query, max_results, newsdata_api_key)
 
-def get_newsdata_fallback(query: str, max_results: int = 3):
+def get_newsdata_fallback(query: str, max_results: int = 3, newsdata_api_key: str = None):
     current_year = "2026"
+    active_newsdata_key = newsdata_api_key or NEWSDATA_API_KEY
     
     # NewsData usa 'q' pero puede ser menos flexible con operadores booleanos complejos en el free tier.
     # Eliminamos las comillas extrañas si las hay y buscamos de forma simple
     clean_query = query.replace('"', '').replace(' OR ', ' ')
     
     params = {
-        "apikey": NEWSDATA_API_KEY,
+        "apikey": active_newsdata_key,
         "q": f"{clean_query} {current_year}",
         "language": "es"
     }

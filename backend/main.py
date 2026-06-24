@@ -207,9 +207,15 @@ async def get_matches(league_id: str, db: Session = Depends(get_db)):
     return {"status": "success", "league": league_id, "matches": result}
 
 @app.get("/api/news")
-async def fetch_news(team1: str, team2: str):
+async def fetch_news(team1: str, team2: str, db: Session = Depends(get_db)):
     query = f'"{team1}" OR "{team2}"'
-    news = get_recent_news(query, max_results=3)
+    
+    settings = db.query(models.Setting).filter(models.Setting.key.in_(["news_api_key", "newsdata_api_key"])).all()
+    keys = {s.key: s.value for s in settings}
+    news_key = keys.get("news_api_key")
+    newsdata_key = keys.get("newsdata_api_key")
+    
+    news = get_recent_news(query, max_results=3, news_api_key=news_key, newsdata_api_key=newsdata_key)
     return {"status": "success", "news": news}
 
 @app.post("/force_sync")
@@ -302,13 +308,20 @@ async def create_preference(item: dict):
         raise HTTPException(status_code=500, detail=f"Error creating preference: {str(e)}")
 
 @app.post("/send_welcome_email")
-async def send_welcome_email(item: dict):
+async def send_welcome_email(item: dict, db: Session = Depends(get_db)):
     email = item.get("email")
     plan_id = item.get("plan_id", "mensual")
     
     if not email:
         raise HTTPException(status_code=400, detail="Email is required")
         
+    # Save to database
+    today = str(date.today())
+    subscriber = models.Subscriber(email=email, plan_id=plan_id, date=today)
+    db.add(subscriber)
+    db.commit()
+    
+
     print(f"\n{'='*40}")
     print(f"📧 ENVIANDO EMAIL DE BIENVENIDA")
     print(f"Para: {email}")
@@ -372,6 +385,13 @@ async def get_analytics(password: str = "", db: Session = Depends(get_db)):
         raise HTTPException(status_code=401, detail="Unauthorized")
     records = db.query(models.Analytics).order_by(models.Analytics.id.desc()).limit(30).all()
     return records
+
+@app.get("/admin/subscribers")
+async def get_subscribers(password: str = "", db: Session = Depends(get_db)):
+    if password != "xguru_admin_123":
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    subscribers = db.query(models.Subscriber).order_by(models.Subscriber.id.desc()).all()
+    return subscribers
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

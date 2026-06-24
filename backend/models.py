@@ -82,3 +82,11 @@ class Analytics(Base):
     date = Column(String, index=True, unique=True) # e.g. "2026-06-23"
     visits = Column(Integer, default=0)
     premium_clicks = Column(Integer, default=0)
+
+class Subscriber(Base):
+    __tablename__ = "subscribers"
+    id = Column(Integer, primary_key=True, index=True)
+    email = Column(String, index=True)
+    plan_id = Column(String)
+    date = Column(String)
+

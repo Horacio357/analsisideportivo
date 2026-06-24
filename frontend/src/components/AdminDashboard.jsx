@@ -15,10 +15,15 @@ const AdminDashboard = ({ onLogout }) => {
     vip_payment_link_trimestral: '',
     vip_payment_link_semestral: '',
     vip_payment_link_anual: '',
-    vip_benefits: ''
+    vip_benefits: '',
+    news_api_key: '',
+    newsdata_api_key: '',
+    football_api_key: '',
+    betting_api_key: ''
   });
   
   const [analytics, setAnalytics] = useState([]);
+  const [subscribers, setSubscribers] = useState([]);
 
   const apiUrl = import.meta.env.VITE_API_URL || 'http://187.127.251.141:8000';
 
@@ -28,6 +33,8 @@ const AdminDashboard = ({ onLogout }) => {
     try {
       const res = await axios.get(`${apiUrl}/admin/analytics?password=${password}`);
       setAnalytics(res.data);
+      const subsRes = await axios.get(`${apiUrl}/admin/subscribers?password=${password}`);
+      setSubscribers(subsRes.data);
       setIsAuthenticated(true);
       fetchSettings();
     } catch (err) {
@@ -44,7 +51,11 @@ const AdminDashboard = ({ onLogout }) => {
         vip_payment_link_trimestral: res.data.vip_payment_link_trimestral || '',
         vip_payment_link_semestral: res.data.vip_payment_link_semestral || '',
         vip_payment_link_anual: res.data.vip_payment_link_anual || '',
-        vip_benefits: res.data.vip_benefits || ''
+        vip_benefits: res.data.vip_benefits || '',
+        news_api_key: res.data.news_api_key || '',
+        newsdata_api_key: res.data.newsdata_api_key || '',
+        football_api_key: res.data.football_api_key || '',
+        betting_api_key: res.data.betting_api_key || ''
       });
     } catch (err) {
       console.error(err);
@@ -59,7 +70,11 @@ const AdminDashboard = ({ onLogout }) => {
         { key: 'vip_payment_link_trimestral', value: settings.vip_payment_link_trimestral },
         { key: 'vip_payment_link_semestral', value: settings.vip_payment_link_semestral },
         { key: 'vip_payment_link_anual', value: settings.vip_payment_link_anual },
-        { key: 'vip_benefits', value: settings.vip_benefits }
+        { key: 'vip_benefits', value: settings.vip_benefits },
+        { key: 'news_api_key', value: settings.news_api_key },
+        { key: 'newsdata_api_key', value: settings.newsdata_api_key },
+        { key: 'football_api_key', value: settings.football_api_key },
+        { key: 'betting_api_key', value: settings.betting_api_key }
       ];
       await axios.post(`${apiUrl}/admin/settings?password=${password}`, updates);
       setMessage('Configuración guardada correctamente');
@@ -119,6 +134,18 @@ const AdminDashboard = ({ onLogout }) => {
           style={{ flex: 1, padding: '10px', background: activeTab === 'analytics' ? 'var(--accent-color)' : 'rgba(0,0,0,0.5)', color: activeTab === 'analytics' ? '#000' : '#fff', border: '1px solid var(--accent-color)', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}
         >
           <BarChart2 size={18} /> Métricas
+        </button>
+        <button 
+          onClick={() => setActiveTab('subscribers')}
+          style={{ flex: 1, padding: '10px', background: activeTab === 'subscribers' ? 'var(--accent-color)' : 'rgba(0,0,0,0.5)', color: activeTab === 'subscribers' ? '#000' : '#fff', border: '1px solid var(--accent-color)', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}
+        >
+          Suscriptores
+        </button>
+        <button 
+          onClick={() => setActiveTab('integrations')}
+          style={{ flex: 1, padding: '10px', background: activeTab === 'integrations' ? 'var(--accent-color)' : 'rgba(0,0,0,0.5)', color: activeTab === 'integrations' ? '#000' : '#fff', border: '1px solid var(--accent-color)', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}
+        >
+          Integraciones
         </button>
       </div>
 
@@ -208,6 +235,63 @@ const AdminDashboard = ({ onLogout }) => {
           {analytics.length === 0 && (
             <p style={{ textAlign: 'center', color: 'var(--text-dim)' }}>No hay datos registrados aún.</p>
           )}
+        </motion.div>
+      )}
+
+      {activeTab === 'subscribers' && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ background: 'var(--panel-bg)', padding: '20px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
+          <h3 style={{ marginTop: 0, color: 'var(--accent-color)' }}>Usuarios con Intención de Compra</h3>
+          <p style={{ color: 'var(--text-dim)', fontSize: '0.9rem', marginBottom: '20px' }}>Estos usuarios llenaron su correo y fueron redirigidos a Mercado Pago. Cruza esta lista con tus recibos de pago.</p>
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', textAlign: 'left', borderCollapse: 'collapse' }}>
+              <thead>
+                <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+                  <th style={{ padding: '10px' }}>ID</th>
+                  <th style={{ padding: '10px' }}>Fecha</th>
+                  <th style={{ padding: '10px' }}>Correo Electrónico</th>
+                  <th style={{ padding: '10px' }}>Plan</th>
+                </tr>
+              </thead>
+              <tbody>
+                {subscribers.map(sub => (
+                  <tr key={sub.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                    <td style={{ padding: '10px', color: 'var(--text-dim)' }}>#{sub.id}</td>
+                    <td style={{ padding: '10px' }}>{sub.date}</td>
+                    <td style={{ padding: '10px', fontWeight: 'bold' }}>{sub.email}</td>
+                    <td style={{ padding: '10px', color: 'var(--accent-color)' }}>{sub.plan_id.toUpperCase()}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {subscribers.length === 0 && <p style={{ textAlign: 'center', padding: '20px', color: 'var(--text-dim)' }}>No hay registros.</p>}
+          </div>
+        </motion.div>
+      )}
+
+      {activeTab === 'integrations' && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ background: 'var(--panel-bg)', padding: '20px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
+          <h3 style={{ marginTop: 0, color: 'var(--accent-color)', marginBottom: '20px' }}>APIs y Proveedores Externos</h3>
+          
+          <div style={{ marginBottom: '15px' }}>
+            <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text-dim)', fontSize: '0.9rem' }}>News API Key (newsapi.org)</label>
+            <input type="text" value={settings.news_api_key} onChange={(e) => setSettings({...settings, news_api_key: e.target.value})} placeholder="Key de NewsAPI..." style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(0,0,0,0.3)', color: '#fff', boxSizing: 'border-box' }} />
+          </div>
+          <div style={{ marginBottom: '15px' }}>
+            <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text-dim)', fontSize: '0.9rem' }}>NewsData API Key (newsdata.io)</label>
+            <input type="text" value={settings.newsdata_api_key} onChange={(e) => setSettings({...settings, newsdata_api_key: e.target.value})} placeholder="Key de NewsData..." style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(0,0,0,0.3)', color: '#fff', boxSizing: 'border-box' }} />
+          </div>
+          <div style={{ marginBottom: '15px' }}>
+            <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text-dim)', fontSize: '0.9rem' }}>Football Data API Key (football-data.org)</label>
+            <input type="text" value={settings.football_api_key} onChange={(e) => setSettings({...settings, football_api_key: e.target.value})} placeholder="Para usar si activas football-data.org..." style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(0,0,0,0.3)', color: '#fff', boxSizing: 'border-box' }} />
+          </div>
+          <div style={{ marginBottom: '20px' }}>
+            <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text-dim)', fontSize: '0.9rem' }}>Betting Odds API Key (odds-api.com)</label>
+            <input type="text" value={settings.betting_api_key} onChange={(e) => setSettings({...settings, betting_api_key: e.target.value})} placeholder="Para integraciones futuras de cuotas..." style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(0,0,0,0.3)', color: '#fff', boxSizing: 'border-box' }} />
+          </div>
+
+          <button onClick={saveSettings} disabled={loading} className="pes-button" style={{ width: '100%', padding: '12px', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}>
+            <Save size={18} /> {loading ? 'Guardando...' : 'Guardar Integraciones'}
+          </button>
         </motion.div>
       )}
     </div>
